@@ -5,6 +5,7 @@ factories.factory("sqliteRecordsFactory", function($cordovaSQLite){
   var records = {};
 
   return {
+    //select records
     selectRecords: function(){
       var records = [];
       var select = "SELECT * FROM records";
@@ -24,6 +25,27 @@ factories.factory("sqliteRecordsFactory", function($cordovaSQLite){
       })
       return records;
     },
+    //select balance de un día concreto
+    selectBalance: function(from, to){
+      from = Date.parse(from)/1000;
+      to = Date.parse(to)/1000;
+      console.log("from: "+from+" to: "+to);
+      var records = [];
+      var select = "SELECT account_id AS 'cuenta', sum(amount) as balance, date FROM records WHERE date <='" + to + "' GROUP BY account_id";
+      $cordovaSQLite.execute(db, select, []).then(function(results) {
+        if(results.rows.length > 0) {
+          for(var i=0; i<results.rows.length; i++){
+            var temp = {"cuenta":results.rows.item(i).cuenta, "balance": results.rows.item(i).balance, "date": results.rows.item(i).date};
+            records.push(temp);
+            console.log("SELECTED -> cuenta: "+ results.rows.item(i).cuenta + " balance: " + results.rows.item(i).balance + ", Fecha: " + results.rows.item(i).date);
+          }
+        } else {
+          console.log("no results");
+        }
+      })
+      return records;
+    },
+    //select records con filtro de cuenta y fechas
     selectRecords: function(account, from, to){
       var records = [];
       var select;
@@ -41,113 +63,6 @@ factories.factory("sqliteRecordsFactory", function($cordovaSQLite){
             records.push(temp);
             console.log("SELECTED -> id: " + results.rows.item(i).id + ", Fecha: " + results.rows.item(i).date + ", operation: " + results.rows.item(i).operation + ", amount: " + results.rows.item(i).amount +
               ", account_id: " + results.rows.item(i).account_id + ", category_id: " + results.rows.item(i).category_id + ", description: " + results.rows.item(i).description);
-          }
-        } else {
-          console.log("no results");
-        }
-      })
-      return records;
-    },
-    //para recoger balance, hace falta unir records
-    selectRecordsTwo: function(from, to){
-      var records = [];
-      var select;
-      var temp;
-      console.log("from: "+from+", to: "+to);
-      dateFrom = new Date(from);
-      dateTo = new Date(to)
-      console.log("dia desde: " + dateFrom.getDate() + "/" + (dateFrom.getMonth()+1) + "/" + dateFrom.getFullYear());
-      console.log("dia hasta: " + dateTo.getDate() + "/" + (dateTo.getMonth()+1) + "/" + dateTo.getFullYear());
-      select = "SELECT * FROM records WHERE date >='"+from+"' AND date <='"+to+"' ORDER BY account_id";
-      //temp = "{\"key\": 0, \"values\": [";
-      temp = "{\"categories\":[";
-      $cordovaSQLite.execute(db, select, []).then(function(results) {
-        if(results.rows.length > 0) {
-          for(var i=0; i<results.rows.length; i++){
-            //rellenar categories
-            //results.rows.item(i).date
-            tempdate = new Date(results.rows.item(i).date);
-            temp = temp.concat("\""+tempdate.getDate() + "/" + (tempdate.getMonth()+1) + "/" + tempdate.getFullYear()+"\"");
-            if(i+1 < results.rows.length){
-              temp = temp.concat(",")
-            }
-          }
-          //se cierra categories
-          //se crean strings para almacenar las series
-          var strings = [];
-          var total = [];
-          for (var i = 1; i <= 21; ++i) {
-              strings[i] = "";
-              total[i] = 0;
-          }
-
-          temp = temp.concat("],\"series\":[");
-          //for(i=1; i<results.rows.)
-
-          //segundo for para rellenar series a partir de aquí
-          for(i=0; i<results.rows.length; i++){
-            switch(results.rows.item(i).account_id){
-              case 1:
-                if(strings[1]==""){
-                  strings[1] = strings[1].concat("{\"name\":\"1\",\"data\":[");
-                }
-                if(results.rows.item(i).operation == "income"){
-                  total[1] += results.rows.item(i).amount;
-                } else {
-                  total[1] -= results.rows.item(i).amount;
-                }
-                strings[1] = strings[1].concat(""+total[1]);
-                if(i+1 < results.rows.length){
-                  temp = temp.concat(",")
-                }
-            }
-
-          }
-          temp = temp.concat("]}")
-          console.log("TEMP QUEDA ASÍ: "+temp);
-          records.push(temp);
-          //grafica antigua, calcula el total, luego concatena[date , total]
-          /*if(results.rows.item(i).operation == "income"){
-              total += results.rows.item(i).amount;
-            }else {
-              total -= results.rows.item(i).amount;
-            }
-            temp = temp.concat("["+results.rows.item(i).date+", "+total+"]");
-            if(i+1 < results.rows.length){
-              temp = temp.concat(",")
-            }*/
-/*
-{"categories":["10/06/2016","15/06/2016"],"series":[{"name":"Download","data":[50,70]},{"name":"Upload","data":[40,70]}]}
-{
-  "categories": ["10/06/2016", "11/06/2016", "12/06/2016", "13/06/2016", "14/06/2016", "15/06/2016"],
-  "series": [{
-    "name": "Download",
-    "data": [50, 60, 70, 50, 60, 70]
-  }, {
-    "name": "Upload",
-    "data": [40, 30, 60, 50, 60, 70]
-  }]
-}
-*/
-
-            /*console.log("SELECTED -> id: " + results.rows.item(i).id + ", Fecha: " + results.rows.item(i).date + ", operation: " + results.rows.item(i).operation + ", amount: " + results.rows.item(i).amount +
-              ", account_id: " + results.rows.item(i).account_id + ", category_id: " + results.rows.item(i).category_id + ", description: " + results.rows.item(i).description);*/
-        } else {
-          console.log("no results");
-        }
-      })
-      return records;
-    },
-    selectLastMonthRecords: function(from, to){
-      var records = [];
-      //console.log("Select last 30 days, from: "+Date.now()-2592000+" to "+Date.now());
-      var select = "SELECT * FROM records WHERE date >='"+from+"' AND date <='"+to+"'";
-      $cordovaSQLite.execute(db, select, []).then(function(results) {
-        if(results.rows.length > 0){
-          for(i=0; i<results.rows.length; i++){
-            var temp = {"operation": results.rows.item(i).operation, "amount": results.rows.item(i).amount, "category_id": results.rows.item(i).category_id};
-            records.push(temp);
-            console.log("30DAYS -> operation:"+results.rows.item(i).operation+", amount: "+results.rows.item(i).amount+", category_id: "+results.rows.item(i).category_id);
           }
         } else {
           console.log("no results");
