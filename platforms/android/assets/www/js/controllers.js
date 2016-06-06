@@ -351,166 +351,88 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
 
 });
 
-controllers.controller("ChartsCtrl", function($scope, sqliteAccountsFactory, sqliteRecordsFactory, $timeout){
+controllers.controller("ChartsCtrl", function($scope, sqliteRecordsFactory, $timeout){
+  // hace dos semanas -> new Date(+new Date - 12096e5);
+  var start = new Date(+new Date - 12096e5);
+  start.setHours(0, 0, 0, 0);
+  year = start.getFullYear();
+  month = start.getMonth() + 1;
+  day = start.getDate();
+  //console.log("año: " + year + " mes: " + month + " dia: " + day);
+  var end = new Date(+new Date);
+  end.setHours(0, 0, 0, 0);
+
+  //for(i=0; i++; i<14){
+    var temp = {};
+    temp = sqliteRecordsFactory.selectBalance(start, end);
+    $timeout(function () {
+      console.log("temp: "+temp);
+      console.log("temp: "+angular.toJson(temp));
+    }, 500);
+  //}
 
   $scope.chartarea = {
     options: {
       chart: {
         type: 'area',
-        inverted: false,
-        zoomType: 'xy',
-        height: 250,
+      },
+      title: {
+        text: 'Balance',
+      },
+      xAxis: {
+        type: 'datetime',
+        dateTimeLabelFormats: { // don't display the dummy year
+          month: '%e. %b',
+          year: '%b'
+        }
       },
       plotOptions: {
+        area: {
+          marker: {
+            enabled: true,
+            symbol: 'circle',
+            radius: 2,
+            states: {
+              hover: {
+                enabled: true
+              }
+            }
+          }
+        },
         series: {
-          cursor: 'pointer',
-          column: {
-            size: '30%',
-          },
+          pointStart: Date.UTC(year, month, day),
+          pointInterval: 24 * 3600 * 1000 // one day
         }
       },
-      colors: ['#058dc7', '#50b432', '#F4A460', '#FF0000', '#F1FF83']
-    },
-    xAxis: {
-      categories: ["10/06/2016", "11/06/2016", "12/06/2016", "13/06/2016", "14/06/2016", "15/06/2016"],
-      title: {
-        text: ''
+      tooltip: {
+        pointFormat: '{series.name}: <b>{point.y}€</b><br/>'
       },
-      labels: {
-        rotation: -90,
-        style: {
-          fontSize: '12px',
-        }
-      }
     },
     yAxis: {
-      min: 0,
       title: {
-        text: 'Euros (€)',
-        align: 'middle'
+        text: 'Euros (€)'
       },
       labels: {
-        overflow: 'justify'
+        formatter: function() {
+          return this.value + '€';
+        }
       }
-    },
-    tooltip: {
-      valueSuffix: ' '
-    },
-    legend: {
-      layout: 'vertical',
-      align: 'right',
-      verticalAlign: 'top',
-      floating: false,
-      borderWidth: 1,
-      backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
-      shadow: true
     },
     credits: {
       enabled: false
     },
-    title: {
-      text: 'Balance',
-      style: {
-        //color: '#FF00FF',
-        fontSize: '12px'
-      },
-    },
     "series": [{
       "name": "Ahorros",
-      "data": [50, 60, 70, 50, 60, 70]
-    },{
+      "data": [50, 60, 70, 50, 60, 70, 50, 60, 70, 50, 60, 70, 50, 60]
+    }, {
       "name": "Metalico",
-      "data": [40, 30, 60, 50, 60, 60]
-    },{
+      "data": [40, 30, 60, 50, 60, 40, 30, 60, 50, 60, 40, 30, 60, 50]
+    }, {
       "name": "Caja B",
-      "data": [5, 10.2, 30, 35, 35, 35]
-    },{
+      "data": [5, 10.2, 30, 35, 35, 35, 5, 10.2, 30, 35, 35, 35, 5, 10.2]
+    }, {
       "name": "Foo",
-      "data": [25.56, 64, 7, 90, 0, 50]
+      "data": [25.56, 64, 27, 70, 10, 50, 25.56, 64, 27, 70, 10, 50, 25.56, 64]
     }],
-    loading: false
-}
-/*
-{
-  "key": 0,
-  "values": [
-    [
-      1463824800000,
-      100
-    ],
-    [
-      1463911200000,
-      200
-    ],
-    [
-      1463997600000,
-      300
-    ],
-    [
-      1464084000000,
-      400
-    ],
-    [
-      1464170400000,
-      500
-    ],
-    [
-      1464256800000,
-      600
-    ]
-  ]
-}
-*/
-
-
-  //$scope.repDate = {};
-
-  $scope.accounts = [];
-  $scope.accounts = sqliteAccountsFactory.selectAccounts();
-  $scope.accounts.unshift({id: 0, name: 'Todas'});
-  $scope.repDate = {
-    account: $scope.accounts[0].id
-  };
-
-  $scope.onChangeDates = function(){
-    console.log("seleccionada: "+$scope.repDate.account);
-    $scope.repDate.record = sqliteRecordsFactory.selectRecordsTwo($scope.repDate.account, (Date.now()-2592000000), Date.now());
-    var temp = $scope.repDate.record;
-
-    $timeout(function () {
-      console.log("dentro fill(): "+temp);
-      $scope.vm.data.push(JSON.parse(temp));
-    }, 50);
   }
-
-  /*$scope.$on("$ionicView.enter", function () {
-    //console.log("Select last 30 days, from: "+(Date.now()-2592000)+" to "+Date.now());
-    //$scope.chart();
-  });*/
-
-  /*$scope.chart = function() {
-    var db = $cordovaSQLite.openDB({ name: "my.db" });
-    var records = [];
-    var select = "SELECT * FROM records WHERE date >='"+(Date.now()-2592000)+"' AND date <='"+Date.now()+"'";
-    $cordovaSQLite.execute(db, select, []).then(function(results) {
-      if(results.rows.length > 0){
-        for(i=0; i<results.rows.length; i++){
-          var temp = {"operation": results.rows.item(i).operation, "amount": results.rows.item(i).amount, "category_id": results.rows.item(i).category_id};
-          records.push(temp);
-          console.log("30DAYS -> operation:"+results.rows.item(i).operation+", amount: "+results.rows.item(i).amount+", category_id: "+results.rows.item(i).category_id);
-        }
-      } else {
-        console.log("no results");
-      }
-    })
-    return records;
-  }*/
-
-  //SELECT * FROM statistics WHERE date BETWEEN datetime('now', 'start of month') AND datetime('now', 'localtime');
-  //http://stackoverflow.com/questions/10504218/query-last-day-last-week-last-month-sqlite
-  //sqliteRecordsFactory.selectRecords();
-
-  $scope.test = function(){
-    $scope.vm.data = []
-  };
 });
