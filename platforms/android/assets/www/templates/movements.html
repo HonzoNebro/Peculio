@@ -1,0 +1,21 @@
+<ion-view view-title="Movimientos" ng-controller="MovementsCtrl">
+  <ion-content class="padding">
+  	<ion-list>
+  		<ion-item>
+		    Cuenta/s: <select ng-model="mov.account" ng-options="account.id as account.name for account in accounts" ng-change="onChangeDates()"></select>
+	    </ion-item>
+	    <!--
+        <ion-item>
+          Mes/es: <select ng-model="mov.month" ng-options="month.id as month.name for month in months" ng-change="change()"></select>
+          Año/s: <select ng-model="mov.year" ng-options="year.id as year.name for year in years" ng-change="change()"></select>
+        </ion-item>
+      -->
+      <ion-item><button class="button button-balanced padding" ng-click="fromBtn()">Desde</button>{{from}}<button class="button button-balanced padding" ng-click="toBtn()">Hasta</button> {{to}}</ion-item>
+
+      <ion-item><button class="button button-balanced padding" ng-click="fill()">GOES</button></ion-item>
+      <ion-item collection-repeat="record in records"></ion-item>
+      {{record}}
+    </ion-list>
+  </ion-content>
+    }
+</ion-view>
