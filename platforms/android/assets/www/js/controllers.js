@@ -1,17 +1,6 @@
 var controllers = angular.module("starter.controllers", [])
 
 controllers.controller("AppCtrl", function($scope, $ionicNavBarDelegate, $ionicPopup, $ionicHistory, $timeout, userService, $ionicModal) {
-  /*var temp = userService.getDato();
-  $scope.operation = {
-    amo: temp
-  };
-  console.log("temp en calculadora: "+temp);*/
-
-  /*$scope.$on("$ionicView.enter", function () {
-    var temp = userService.getDato();
-    $scope.operation.amo = temp;
-  });*/
-
   $scope.btnClicked = function(btn) {
     //borar y poner 0
     if (btn == "C") {
@@ -175,10 +164,9 @@ controllers.controller("AppCtrl", function($scope, $ionicNavBarDelegate, $ionicP
 
 //controlador operaciones
 controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory, sqliteRecordsFactory, sqliteAccountsFactory, sqliteCategoriesFactory, ionicDatePicker, userService, $ionicModal) {
-  console.log("entro operationCtrl");
+  //console.log("entro operationCtrl");
   $scope.operation = {};
   $scope.operation.amo ="";
-  console.log("testgithub");
   /*$scope.operation = {
     amo: "0"
   };
@@ -194,28 +182,6 @@ controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory
   $scope.openModal = function() {
     $scope.modal.show();
   };
-
-
-  //var temp = userService.getDato();
-
-  //var temp = userService.getDato();
-  /*if($scope.operation == null){
-    $scope.operation = {
-      amo: temp
-    };
-  }*/
-
-  /*$scope.$watch('operation.amo', function (newValue, oldValue) {
-    if (newValue !== oldValue){
-      if(newValue == null){
-        userService.setDato(0);
-        console.log("watch nuevo dato: "+newValue+ " así que establecido a 0");
-      } else {
-        userService.setDato(newValue);
-        console.log("watch nuevo dato: "+newValue);
-      }
-    } 
-  }, true);  */
 
   var date;
 //mirar movements, y comprar con este select, este no va bien
@@ -253,7 +219,7 @@ controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory
 
   $scope.insertRecInc = function(){
     if($scope.operation.date == null){
-      date = Date.now();
+      date = Math.floor(Date.now()/1000);
     }
     var operation = "income";
     var amount = $scope.operation.amo;
@@ -263,7 +229,7 @@ controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory
       $scope.operation.des = "";
     }
     var description = $scope.operation.des;
-    console.log($scope.operation.acc)
+    //console.log($scope.operation.acc)
     //console.log("cat: "+ category_id + "acc: " + account_id)
     sqliteRecordsFactory.insertRecord(date, operation, amount, account_id, category_id, description);
     $timeout(function () {
@@ -273,11 +239,16 @@ controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory
   }
 
   $scope.insertRecExp = function(){
-    var date = Date.now();
+    if($scope.operation.date == null){
+      date = Math.floor(Date.now()/1000);
+    }
     var operation = "expense";
-    var amount = $scope.operation.amo;
+    var amount = "-"+$scope.operation.amo;
     var account_id = $scope.operation.acc;
     var category_id = $scope.operation.cat;
+    if ($scope.operation.des == null){
+      $scope.operation.des = "";
+    }
     var description = $scope.operation.des;
     sqliteRecordsFactory.insertRecord(date, operation, amount, account_id, category_id, description);
     $timeout(function () {
@@ -288,8 +259,8 @@ controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory
 
   var calendarFrom = {
     callback: function (val) {  //Mandatory
-      console.log('Return value from the datepicker popup is : ' + val +","+new Date(val));
-        date = val;
+      console.log('Return value from the datepicker popup is : ' + Math.floor(val/1000) +","+new Date(val));
+        date = Math.floor(val/1000);
         mydate = new Date(val);
         $scope.operation.date = "" + mydate.getDate() + "/" + (mydate.getMonth()+1) + "/" + mydate.getFullYear();
         //$scope.operation.date = date;
@@ -312,23 +283,23 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
 
   var calendarFrom = {
     callback: function (val) {  //Mandatory
-      console.log('Return value from the datepicker popup is : ' + val, new Date(val));
+      console.log('Return value from the datepicker popup is : ' + Math.floor(val/1000) + " " + new Date(val));
         //$scope.from = new Date(val).toDateString();
         var date = new Date(val);
         $scope.from = "" + date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear();
-        from = val;
+        from = Math.floor(val/1000);
         //fill(date, Date.now());
     }
   };
 
   var calendarTo = {
     callback: function (val) {  //Mandatory
-      console.log('Return value from the datepicker popup is : ' + val, new Date(val));
+      console.log('Return value from the datepicker popup is : ' + Math.floor(val/1000) + " " + new Date(val));
         //$scope.from = new Date(val).toDateString();
         var date = new Date(val);
         $scope.to = "" + date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear();
         //fill($scope.from, $scope.to);
-        to = val;
+        to = Math.floor(val/1000);
     }
   };
 
@@ -341,8 +312,8 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
   };
 
   $scope.fill = function(){
-    $scope.record = sqliteRecordsFactory.selectRecords($scope.mov.account, from, to);
-    var record = $scope.record;
+    $scope.records = sqliteRecordsFactory.selectRecords($scope.mov.account, from, to);
+    var record = $scope.records;
     
     $timeout(function () {
       console.log("dentro Angularfill(): "+angular.toJson(record));
@@ -364,10 +335,8 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
       $scope.accounts.unshift({id: 0, name: 'Todas'});
       $scope.mov = {
         account: $scope.accounts[0].id,
-        month: $scope.months[0].id,
-        year: $scope.years[0].id
       };
-      console.log("mov.account:" + $scope.mov.account + ", mov.month: " + $scope.mov.month + ", mov.year: " + $scope.mov.year);
+      console.log("mov.account:" + $scope.mov.account);
     }, 50);
     /*
     coger registros y sacar mes y año usando esto:
@@ -376,45 +345,8 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
     */
   });
 
-/*
-  $scope.accounts = [
-    {id: 1, name: 'Efectivo'},
-    {id: 2, name: 'Tarjeta'}
-  ];
-  */
-/*
-  $scope.months = [
-    {id: 0, name: 'Todos'},
-    {id: 1, name: 'Enero'},
-    {id: 2, name: 'Febrero'},
-    {id: 3, name: 'Marzo'},
-    {id: 4, name: 'Abril'},
-    {id: 5, name: 'Mayo'},
-    {id: 6, name: 'Junio'},
-    {id: 7, name: 'Julio'},
-    {id: 8, name: 'Agosto'},
-    {id: 9, name: 'Septiembre'},
-    {id: 10, name: 'Octubre'},
-    {id: 11, name: 'Noviembre'},
-    {id: 12, name: 'Diciembre'}
-  ];
-
-  $scope.years = [
-    {id: 0, name: 'Todos'},
-    {id: 1, name: '2001'},
-    {id: 2, name: '2002'},
-    {id: 3, name: '2003'}
-  ];
-*/
-
-/*
-  $scope.mov = {
-    account: $scope.accounts[0].id,
-    month: $scope.months[0].id
-  };*/
-
   $scope.onChangeDates = function(){
-    console.log("mov.account:" + $scope.mov.account + ", mov.month: " + $scope.mov.month + ", mov.year: " + $scope.mov.year);
+    console.log("mov.account:" + $scope.mov.account);
   };
 
 });
@@ -577,73 +509,6 @@ controllers.controller("ChartsCtrl", function($scope, sqliteAccountsFactory, sql
   //SELECT * FROM statistics WHERE date BETWEEN datetime('now', 'start of month') AND datetime('now', 'localtime');
   //http://stackoverflow.com/questions/10504218/query-last-day-last-week-last-month-sqlite
   //sqliteRecordsFactory.selectRecords();
-
-  $scope.vm = this;
-  $scope.vm.options = {
-    chart: {
-      type: 'lineChart',
-      height: 450,
-      margin: {
-        top: 10,
-        right: 10,
-        bottom: 20,
-        left: 10
-      },
-      x: function(d) {
-        return d[0];
-      },
-      y: function(d) {
-        return d[1];
-      },
-      useVoronoi: false,
-      clipEdge: true,
-      duration: 100,
-      useInteractiveGuideline: true,
-      xAxis: {
-        showMaxMin: false,
-        tickFormat: function(d) {
-          return d3.time.format('%x')(new Date(d))
-        }
-      },
-      yAxis: {
-        tickFormat: function(d) {
-          return d3.format(',.2f')(d);
-        }
-      },
-      zoom: {
-        enabled: true,
-        scaleExtent: [1, 10],
-        useFixedDomain: false,
-        useNiceScale: false,
-        horizontalOff: false,
-        verticalOff: true,
-        unzoomEventType: 'dblclick.zoom'
-      }
-    }
-  },
-  $scope.vm.data = [
-  //[[fechatimestamp, valor], [fechatimestamp, valor]]
-    {
-      "key": "North America",
-      "values": [
-        [1462101370000, 3],
-        [1462187770000, 9],
-        [1462274170000, 1],
-        [1462360570000, 2],
-        [1462446970000, 5]
-      ]
-    },
-    {
-      "key": "Africa",
-      "values": [
-        [1462101370000, 7],
-        [1462187770000, 7],
-        [1462274170000, 7],
-        [1462360570000, 5],
-        [1462446970000, 6]
-      ]
-    }
-  ]
 
   $scope.test = function(){
     $scope.vm.data = []
