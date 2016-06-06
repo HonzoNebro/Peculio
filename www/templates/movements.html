@@ -10,11 +10,12 @@
           Año/s: <select ng-model="mov.year" ng-options="year.id as year.name for year in years" ng-change="change()"></select>
         </ion-item>
       -->
-      <ion-item><button class="button button-balanced padding" ng-click="fromBtn()">Desde</button>{{from}}<button class="button button-balanced padding" ng-click="toBtn()">Hasta</button> {{to}}</ion-item>
+      <ion-item><button class="button button-small button-balanced padding" ng-click="fromBtn()">Desde</button>{{from}}<button class="button button-small button-balanced padding" ng-click="toBtn()">Hasta</button> {{to}}</ion-item>
 
-      <ion-item><button class="button button-balanced padding" ng-click="fill()">GOES</button></ion-item>
-      <ion-item collection-repeat="record in records"></ion-item>
-      {{record}}
+      <ion-item><button class="button button-small button-balanced padding" ng-click="fill()">GOES</button></ion-item>
+      <ion-item collection-repeat="record in records">
+        {{record}}
+      </ion-item>
     </ion-list>
   </ion-content>
     }

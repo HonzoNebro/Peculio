@@ -1,7 +1,7 @@
 <ion-view view-title="Agregar Ingresos" ng-controller="OperationCtrl">
   <ion-content class="padding">
     <div>
-      <button class="button button-balanced padding" ng-click="chooseDate()">personalizar fecha</button>
+      <button class="button button-small  button-balanced padding" ng-click="chooseDate()">personalizar fecha</button>
     </div>
     <div>
       <input type="text" placeholder="fecha" ng-model="operation.date")
@@ -40,7 +40,7 @@
   	</label>
 
   	<div>
-  		<button class="button button-balanced padding" ng-disabled="!operation.amo || !operation.acc || !operation.cat" ng-click="insertRecInc()">Hecho</button>
+  		<button class="button button-small  button-balanced padding" ng-disabled="!operation.amo || !operation.acc || !operation.cat" ng-click="insertRecInc()">Hecho</button>
   	</div>
   <!--
   	<div>

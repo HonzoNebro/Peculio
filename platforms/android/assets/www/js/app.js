@@ -52,13 +52,15 @@ angular.module('starter', ['ionic', 'ngCordova', 'starter.controllers', 'starter
     $cordovaSQLite.execute(db, "INSERT INTO accounts (name) VALUES (?)", ["Cuenta Corriente"]);
     $cordovaSQLite.execute(db, "INSERT INTO accounts (name) VALUES (?)", ["Ahorros"]);
     $cordovaSQLite.execute(db, "DROP TABLE IF EXISTS records");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS records (id INTEGER PRIMARY KEY, date INTEGER, operation TEXT, amount REAL, account_id INTEGER, category_id INTEGER, description TEXT, FOREIGN KEY (category_id) REFERENCES categories (id), FOREIGN KEY (account_id) REFERENCES accounts (id))");
-    $cordovaSQLite.execute(db, "INSERT INTO records (id, date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?,?)", [1,1463824800000,'income',100,1,1,'test']);
-    $cordovaSQLite.execute(db, "INSERT INTO records (id, date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?,?)", [2,1463911200000,'income',100,2,1,'test2']);
-    $cordovaSQLite.execute(db, "INSERT INTO records (id, date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?,?)", [3,1463997600000,'income',100,3,1,'test3']);
-    $cordovaSQLite.execute(db, "INSERT INTO records (id, date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?,?)", [4,1464084000000,'income',100,1,1,'test']);
-    $cordovaSQLite.execute(db, "INSERT INTO records (id, date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?,?)", [5,1464170400000,'income',100,2,1,'test2']);
-    $cordovaSQLite.execute(db, "INSERT INTO records (id, date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?,?)", [6,1464256800000,'income',100,3,1,'test3']);
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS records (id INTEGER PRIMARY KEY AUTOINCREMENT, date INTEGER, operation TEXT, amount REAL, account_id INTEGER, category_id INTEGER, description TEXT, FOREIGN KEY (category_id) REFERENCES categories (id), FOREIGN KEY (account_id) REFERENCES accounts (id))");
+    $cordovaSQLite.execute(db, "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)", [1463824800,'income',100,1,1,'test']);
+    $cordovaSQLite.execute(db, "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)", [1463911200,'expense',-100,2,1,'test2']);
+    $cordovaSQLite.execute(db, "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)", [1463997600,'income',100,3,1,'test3']);
+    $cordovaSQLite.execute(db, "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)", [1464084000,'expense',-100,1,1,'test4']);
+    $cordovaSQLite.execute(db, "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)", [1464170400,'income',100,2,1,'test5']);
+    $cordovaSQLite.execute(db, "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)", [1464256800,'income',100,3,1,'test6']);
+    $cordovaSQLite.execute(db, "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)", [1464825600,'income',100,3,1,'test10']);
+    $cordovaSQLite.execute(db, "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)", [1464912000,'expense',-100,3,1,'test11']);
   });
 })
 
