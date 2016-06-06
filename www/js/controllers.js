@@ -1,17 +1,6 @@
 var controllers = angular.module("starter.controllers", [])
 
 controllers.controller("AppCtrl", function($scope, $ionicNavBarDelegate, $ionicPopup, $ionicHistory, $timeout, userService, $ionicModal) {
-  /*var temp = userService.getDato();
-  $scope.operation = {
-    amo: temp
-  };
-  console.log("temp en calculadora: "+temp);*/
-
-  /*$scope.$on("$ionicView.enter", function () {
-    var temp = userService.getDato();
-    $scope.operation.amo = temp;
-  });*/
-
   $scope.btnClicked = function(btn) {
     //borar y poner 0
     if (btn == "C") {
@@ -194,28 +183,6 @@ controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory
   $scope.openModal = function() {
     $scope.modal.show();
   };
-
-
-  //var temp = userService.getDato();
-
-  //var temp = userService.getDato();
-  /*if($scope.operation == null){
-    $scope.operation = {
-      amo: temp
-    };
-  }*/
-
-  /*$scope.$watch('operation.amo', function (newValue, oldValue) {
-    if (newValue !== oldValue){
-      if(newValue == null){
-        userService.setDato(0);
-        console.log("watch nuevo dato: "+newValue+ " así que establecido a 0");
-      } else {
-        userService.setDato(newValue);
-        console.log("watch nuevo dato: "+newValue);
-      }
-    } 
-  }, true);  */
 
   var date;
 //mirar movements, y comprar con este select, este no va bien
