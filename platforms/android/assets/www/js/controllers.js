@@ -339,29 +339,10 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
     borrar de registro de BBDD */
   }
 
-  $scope.borrar = function(id) {
-
-    db.transaction(function (tx) {
-
-        var query = "DELETE FROM records WHERE id = ?";
-
-        tx.executeSql(query, [id], function (tx, res) {
-            console.log("removeId: " + res.insertId);
-            console.log("rowsAffected: " + res.rowsAffected);
-        },
-        function (tx, error) {
-            console.log('DELETE error: ' + error.message);
-        });
-    }, function (error) {
-        console.log('transaction error: ' + error.message);
-    }, function () {
-        console.log('transaction ok');
-    });
-}
-
   $scope.$on("$ionicView.enter", function () {
     $scope.accounts = [];
     $scope.accounts = sqliteAccountsFactory.selectAccounts();
+    $scope.records = sqliteMovementsFactory.selectMovements(0, 0, 16725225600);
     $timeout(function () {
       $scope.accounts.unshift({id: 0, name: 'Todas'});
       $scope.mov = {
