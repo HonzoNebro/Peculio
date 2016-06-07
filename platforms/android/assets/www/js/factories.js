@@ -162,9 +162,9 @@ factories.factory("sqliteMovementsFactory", function($cordovaSQLite) {
       var select;
       //console.log("account: "+account+ ", from: "+from+", to: "+to);
       if(account != 0) {
-        select = "SELECT r.id AS 'id', date, operation, a.name AS 'account', c.name AS 'category', amount FROM records AS 'r' INNER JOIN accounts AS 'a' ON r.account_id = a.id INNER JOIN categories AS 'c' ON r.category_id = c.id WHERE date >='"+from+"' AND date <='"+to+"' AND account_id = '"+account+"' ORDER BY date";
+        select = "SELECT r.id AS 'id', date, operation, a.name AS 'account', c.name AS 'category', amount FROM records AS 'r' INNER JOIN accounts AS 'a' ON r.account_id = a.id INNER JOIN categories AS 'c' ON r.category_id = c.id WHERE date >='"+from+"' AND date <='"+to+"' AND account_id = '"+account+"' ORDER BY date DESC";
       }else {
-        select = "SELECT r.id AS 'id', date, operation, a.name AS 'account', c.name AS 'category', amount FROM records AS 'r' INNER JOIN accounts AS 'a' ON r.account_id = a.id INNER JOIN categories AS 'c' ON r.category_id = c.id WHERE date >='"+from+"' AND date <='"+to+"' ORDER BY date";
+        select = "SELECT r.id AS 'id', date, operation, a.name AS 'account', c.name AS 'category', amount FROM records AS 'r' INNER JOIN accounts AS 'a' ON r.account_id = a.id INNER JOIN categories AS 'c' ON r.category_id = c.id WHERE date >='"+from+"' AND date <='"+to+"' ORDER BY date DESC";
       }
       //SELECT operation, a.name AS 'Cuenta', c.name AS 'Categoria', amount 
       //FROM records AS 'r' INNER JOIN accounts AS 'a' ON r.account_id = a.id INNER JOIN categories AS 'c' ON r.category_id = c.id;

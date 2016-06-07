@@ -342,6 +342,7 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
   $scope.$on("$ionicView.enter", function () {
     $scope.accounts = [];
     $scope.accounts = sqliteAccountsFactory.selectAccounts();
+    $scope.records = sqliteMovementsFactory.selectMovements(0, 0, 16725225600);
     $timeout(function () {
       $scope.accounts.unshift({id: 0, name: 'Todas'});
       $scope.mov = {
