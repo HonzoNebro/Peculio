@@ -221,7 +221,7 @@ controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory
     if($scope.operation.date == null){
       date = Math.floor(Date.now()/1000);
     }
-    var operation = "income";
+    var operation = "Ingreso";
     var amount = $scope.operation.amo;
     var account_id = $scope.operation.acc;
     var category_id = $scope.operation.cat;
@@ -242,7 +242,7 @@ controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory
     if($scope.operation.date == null){
       date = Math.floor(Date.now()/1000);
     }
-    var operation = "expense";
+    var operation = "Gasto";
     var amount = "-"+$scope.operation.amo;
     var account_id = $scope.operation.acc;
     var category_id = $scope.operation.cat;
@@ -275,12 +275,14 @@ controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory
  
 });
 
-controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccountsFactory, sqliteRecordsFactory, ionicDatePicker){
+controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccountsFactory, sqliteRecordsFactory, ionicDatePicker, sqliteMovementsFactory, $ionicListDelegate){
   $scope.from;
   $scope.to;
   var from;
   var to;
-
+  $scope.shouldShowDelete = false;
+  $scope.shouldShowReorder = false;
+  //$scope.listCanSwipe = true no usado, está ya en true
   var calendarFrom = {
     callback: function (val) {  //Mandatory
       console.log('Return value from the datepicker popup is : ' + Math.floor(val/1000) + " " + new Date(val));
@@ -312,10 +314,10 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
   };
 
   $scope.fill = function(){
-    $scope.records = sqliteRecordsFactory.selectRecords($scope.mov.account, from, to);
+    $scope.records = sqliteMovementsFactory.selectMovements($scope.mov.account, from, to);
     var record = $scope.records;
     
-    $timeout(function () {
+    /*$timeout(function () {
       console.log("dentro Angularfill(): "+angular.toJson(record));
       //console.log("dentro Angularfill2(): "+angular.toJson(record[0]));
       //console.log("dentro Angularfill3(): "+angular.toJson(record.date));
@@ -324,8 +326,17 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
       //console.log("dentro fill2(): "+record[0]);
       //console.log("dentro fill3(): "+record[0].name);
       //console.log("dentro fill4(): "+record[1]);
-    }, 50);
+    }, 50);*/
     
+  }
+
+  $scope.erase = function($index){
+    console.log("borrando: "+$scope.records[$index].id);
+    sqliteRecordsFactory.deleteRecord($scope.records[$index].id);
+    $scope.records.splice($index, 1);
+    $ionicListDelegate.closeOptionButtons();
+    /*
+    borrar de registro de BBDD */
   }
 
   $scope.$on("$ionicView.enter", function () {
@@ -362,14 +373,19 @@ controllers.controller("ChartsCtrl", function($scope, sqliteRecordsFactory, $tim
   var end = new Date(+new Date);
   end.setHours(0, 0, 0, 0);
 
-  //for(i=0; i++; i<14){
-    var temp = {};
+/*console.log("start: "+start+ " i= "+i);
+    start.setDate(start.getDate() + 1);
+    console.log("start: "+start+ " i= "+i);*/
+
+  var temp = {};
+  for(i=0; i<14; i++){
     temp = sqliteRecordsFactory.selectBalance(start, end);
+    start.setDate(start.getDate() + 1);
     $timeout(function () {
       console.log("temp: "+temp);
       console.log("temp: "+angular.toJson(temp));
-    }, 500);
-  //}
+    }, 5000);
+  }
 
   $scope.chartarea = {
     options: {
