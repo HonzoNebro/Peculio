@@ -1,6 +1,6 @@
 var factories = angular.module("starter.factories", [])
 
-factories.factory("sqliteRecordsFactory", function($cordovaSQLite){
+factories.factory("sqliteRecordsFactory", function($cordovaSQLite, $timeout){
   var db = $cordovaSQLite.openDB({ name: "my.db" });
   var records = {};
 
@@ -26,12 +26,11 @@ factories.factory("sqliteRecordsFactory", function($cordovaSQLite){
       return records;
     },
     //select balance de un día concreto
-    selectBalance: function(from, to){
+    selectBalance: function(from){
       from = Date.parse(from)/1000;
-      to = Date.parse(to)/1000;
-      console.log("from: "+from+" to: "+to);
       var records = [];
-      var select = "SELECT account_id AS 'cuenta', sum(amount) as balance, date FROM records WHERE date <='" + from + "' GROUP BY account_id";
+      //var select = "SELECT account_id AS 'cuenta', balance, date FROM records WHERE date <=1465378207 GROUP BY account_id, date ORDER BY date";
+      var select = "SELECT account_id AS 'cuenta', balance, date FROM records WHERE date >='" + from + "' GROUP BY account_id, date";
       $cordovaSQLite.execute(db, select, []).then(function(results) {
         if(results.rows.length > 0) {
           for(var i=0; i<results.rows.length; i++){
@@ -44,8 +43,8 @@ factories.factory("sqliteRecordsFactory", function($cordovaSQLite){
         } else {
           console.log("no results");
         }
-      return records;
       })
+      return records;
     },
     //select records con filtro de cuenta y fechas
     selectRecords: function(account, from, to){
@@ -60,11 +59,11 @@ factories.factory("sqliteRecordsFactory", function($cordovaSQLite){
       $cordovaSQLite.execute(db, select, []).then(function(results) {
         if(results.rows.length > 0) {
           for(var i=0; i<results.rows.length; i++){
-            var temp = {"id": results.rows.item(i).id, "date": results.rows.item(i).date, "operation": results.rows.item(i).operation, "amount": results.rows.item(i).amount, "account_id": results.rows.item(i).account_id,
+            var temp = {"id": results.rows.item(i).id, "date": results.rows.item(i).date, "operation": results.rows.item(i).operation, "amount": results.rows.item(i).amount, "balance": results.rows.item(i).balance, "account_id": results.rows.item(i).account_id,
             "category_id": results.rows.item(i).category_id, "description": results.rows.item(i).description};
             records.push(temp);
             console.log("SELECTED -> id: " + results.rows.item(i).id + ", Fecha: " + results.rows.item(i).date + ", operation: " + results.rows.item(i).operation + ", amount: " + results.rows.item(i).amount +
-              ", account_id: " + results.rows.item(i).account_id + ", category_id: " + results.rows.item(i).category_id + ", description: " + results.rows.item(i).description);
+              ", balance: " + results.rows.item(i).balance + ", account_id: " + results.rows.item(i).account_id + ", category_id: " + results.rows.item(i).category_id + ", description: " + results.rows.item(i).description);
           }
         } else {
           console.log("no results");
@@ -72,10 +71,12 @@ factories.factory("sqliteRecordsFactory", function($cordovaSQLite){
       })
       return records;
     },
-    insertRecord: function(date, operation, amount, account_id, category_id, description){
-      var query = "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)";
-      $cordovaSQLite.executeSql(db, query, [date, operation, amount, account_id, category_id, description]).then(function(results) {
-        console.log("INSERT RECORD DATA: "+date+" "+operation+" "+amount+" "+account_id+" "+category_id+" "+description);
+    //sqliteRecordsFactory.insertRecord(account_id, category_id, amount, description, timestamp, mydate, hour, day, week, month, year);
+    insertRecord: function(account_id, category_id, amount, description, timestamp, mydate, hour, day, week, month, year){
+      var query = "INSERT INTO records (account_id, category_id, amount, description, timestamp, mydate, hour, day, week, month, year) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+      console.log("query: "+query);
+      $cordovaSQLite.execute(db, query, [account_id, category_id, amount, description, timestamp, mydate, hour, day, week, month, year]).then(function(results) {
+        console.log("INSERT RECORD DATA: "+account_id+", "+category_id+", "+amount+", "+description+", "+timestamp+", "+mydate+", "+hour+", "+day+", "+week+", "+month+", "+year);
       }, function (err) {
           console.error(err);
       });
@@ -100,9 +101,45 @@ factories.factory("sqliteCategoriesFactory", function($cordovaSQLite) {
       $cordovaSQLite.execute(db, select, []).then(function(results) {
         if(results.rows.length > 0) {
           for(var i=0; i<results.rows.length; i++){
-            var temp = {"id": results.rows.item(i).id, "name": results.rows.item(i).name}
+            var temp = {"id": results.rows.item(i).id, "name": results.rows.item(i).category}
             categories.push(temp);
             //console.log("Select: " + results.rows.item(i).id + " name: " + results.rows.item(i).name);
+          }
+        } else {
+          console.log("No results found");
+        }
+      })
+      return categories
+    },
+    //devuelve categorias de ahorro
+    selectCategoriesPlus: function(){
+      var categories = [];
+      // ç = +
+      var select = "SELECT * FROM categories WHERE sign = \"ç\"";
+      console.log(select);
+      $cordovaSQLite.execute(db, select, []).then(function(results) {
+        if(results.rows.length > 0) {
+          for(var i=0; i<results.rows.length; i++){
+            var temp = {"id": results.rows.item(i).id, "name": results.rows.item(i).category, "sign": results.rows.item(i).sign, "account": results.rows.item(i).account}
+            categories.push(temp);
+          }
+        } else {
+          console.log("No results found");
+        }
+      })
+      return categories
+    },
+    //devuelve categorias de gasto
+    selectCategoriesMinus: function(){
+      var categories = [];
+      // ¡ = -
+      var select = "SELECT * FROM categories WHERE sign = \"¡\"";
+      console.log(select);
+      $cordovaSQLite.execute(db, select, []).then(function(results) {
+        if(results.rows.length > 0) {
+          for(var i=0; i<results.rows.length; i++){
+            var temp = {"id": results.rows.item(i).id, "name": results.rows.item(i).category, "sign": results.rows.item(i).sign, "account": results.rows.item(i).account}
+            categories.push(temp);
           }
         } else {
           console.log("No results found");
@@ -131,7 +168,7 @@ factories.factory("sqliteAccountsFactory", function($cordovaSQLite) {
       $cordovaSQLite.execute(db, select, []).then(function(results) {
         if(results.rows.length > 0) {
           for(var i=0; i<results.rows.length; i++){
-            var temp = {"id": results.rows.item(i).id, "name": results.rows.item(i).name}
+            var temp = {"id": results.rows.item(i).id, "name": results.rows.item(i).account}
             accounts.push(temp);
             //console.log("Select: " + results.rows.item(i).id + " name: " + results.rows.item(i).name);
           }
@@ -162,16 +199,16 @@ factories.factory("sqliteMovementsFactory", function($cordovaSQLite) {
       var select;
       //console.log("account: "+account+ ", from: "+from+", to: "+to);
       if(account != 0) {
-        select = "SELECT r.id AS 'id', date, operation, a.name AS 'account', c.name AS 'category', amount FROM records AS 'r' INNER JOIN accounts AS 'a' ON r.account_id = a.id INNER JOIN categories AS 'c' ON r.category_id = c.id WHERE date >='"+from+"' AND date <='"+to+"' AND account_id = '"+account+"' ORDER BY date DESC";
+        select = "SELECT r.id AS 'id', balance, date, operation, a.name AS 'account', c.name AS 'category', amount FROM records AS 'r' INNER JOIN accounts AS 'a' ON r.account_id = a.id INNER JOIN categories AS 'c' ON r.category_id = c.id WHERE date >='"+from+"' AND date <='"+to+"' AND account_id = '"+account+"' ORDER BY date DESC";
       }else {
-        select = "SELECT r.id AS 'id', date, operation, a.name AS 'account', c.name AS 'category', amount FROM records AS 'r' INNER JOIN accounts AS 'a' ON r.account_id = a.id INNER JOIN categories AS 'c' ON r.category_id = c.id WHERE date >='"+from+"' AND date <='"+to+"' ORDER BY date DESC";
+        select = "SELECT r.id AS 'id', balance, date, operation, a.name AS 'account', c.name AS 'category', amount FROM records AS 'r' INNER JOIN accounts AS 'a' ON r.account_id = a.id INNER JOIN categories AS 'c' ON r.category_id = c.id WHERE date >='"+from+"' AND date <='"+to+"' ORDER BY date DESC";
       }
       //SELECT operation, a.name AS 'Cuenta', c.name AS 'Categoria', amount 
       //FROM records AS 'r' INNER JOIN accounts AS 'a' ON r.account_id = a.id INNER JOIN categories AS 'c' ON r.category_id = c.id;
       $cordovaSQLite.execute(db, select, []).then(function(results) {
         if(results.rows.length > 0) {
           for(var i=0; i<results.rows.length; i++){
-            var temp = {"id": results.rows.item(i).id, "date": results.rows.item(i).date, "operation": results.rows.item(i).operation, "account": results.rows.item(i).account, "category": results.rows.item(i).category, "amount": results.rows.item(i).amount}
+            var temp = {"id": results.rows.item(i).id, "date": results.rows.item(i).date, "operation": results.rows.item(i).operation, "account": results.rows.item(i).account, "category": results.rows.item(i).category, "amount": results.rows.item(i).amount, "balance": results.rows.item(i).balance}
             movements.push(temp);
             //console.log("SELECTED -> Operación: " + results.rows.item(i).operation + " Cuenta: " + results.rows.item(i).name + " Cantidad: " results.rows.item(i).amount + "€");
           }
@@ -181,10 +218,94 @@ factories.factory("sqliteMovementsFactory", function($cordovaSQLite) {
       })
       return movements
     },
+    selectBalanceAcc: function(from){
+      from = Date.parse(from)/1000;
+      var records = [];
+      //var select = "SELECT account_id AS 'cuenta', balance, date FROM records WHERE date <=1465378207 GROUP BY account_id, date ORDER BY date";
+      var select = "SELECT a.name AS 'cuenta', balance FROM records AS 'r' INNER JOIN accounts AS 'a' ON r.account_id = a.id WHERE date >='" + from + "' GROUP BY account_id, date";
+      $cordovaSQLite.execute(db, select, []).then(function(results) {
+        if(results.rows.length > 0) {
+          //var acc = results.rows.item(1).cuenta;
+          for(var i=0; i<results.rows.length; i++){
+            /*if(results.rows.item(i).cuenta != acc){
+              var separador = {"-"};
+              records.push(temp);
+            }*/
+            var temp = {"cuenta":results.rows.item(i).cuenta, "balance": results.rows.item(i).balance};
+            //console.log(angular.toJson(temp));
+            records.push(temp);
+            //console.log("SELECTED -> cuenta: "+ results.rows.item(i).cuenta + " balance: " + results.rows.item(i).balance + ", Fecha: " + results.rows.item(i).date);
+          }
+            console.log("balances: "+angular.toJson(records));
+        } else {
+          console.log("no results");
+        }
+      })
+      return records;
+    },
+    selectBalanceCat: function(from){
+      from = Date.parse(from)/1000;
+      var records = [];
+      //SELECT c.name, sum(amount) FROM categories AS 'c' INNER JOIN records AS 'r' ON c.id = r.category_id GROUP BY c.name;
+      var select = "SELECT c.name AS 'category', sum(amount) as 'total' FROM categories AS 'c' INNER JOIN records AS 'r' ON c.id = r.category_id GROUP BY c.name HAVING sum(amount) < 0";
+      $cordovaSQLite.execute(db, select, []).then(function(results) {
+        if(results.rows.length > 0) {
+          //var acc = results.rows.item(1).cuenta;
+          for(var i=0; i<results.rows.length; i++){
+            /*if(results.rows.item(i).cuenta != acc){
+              var separador = {"-"};
+              records.push(temp);
+            }*/
+            var temp = {"name":results.rows.item(i).category, "y": Math.abs(results.rows.item(i).total)};
+            //console.log(angular.toJson(temp));
+            records.push(temp);
+            //console.log("SELECTED -> cuenta: "+ results.rows.item(i).cuenta + " balance: " + results.rows.item(i).balance + ", Fecha: " + results.rows.item(i).date);
+          }
+            console.log("categories: "+angular.toJson(records));
+        } else {
+          console.log("no results");
+        }
+      })
+      return records;
+    },
     insertMovements: function(name){
       var query = "INSERT INTO movements (name) VALUES (?)";
       $cordovaSQLite.execute(db,query, [name]).then(function(results) {
         console.log("INSERT RECORDS ID -> " + results.insertId);
+      }, function (err) {
+        console.error(err);
+      });
+    },
+    addBalance: function(account_id, category_id, amount, sign, description, timestamp, mydate, hour, day, week, month, year){
+      //agrega el saldo a la cuenta en cuestión
+      var query = "UPDATE accounts SET incomes = (SELECT incomes FROM accounts WHERE id = ?)+?, balance = (SELECT balance FROM accounts WHERE id = ?)+ ? WHERE id = ?";
+      console.log("query: "+query);
+      $cordovaSQLite.execute(db,query, [account_id, amount, account_id, amount, account_id]).then(function(results) {
+        console.log("AGREGADO SALDO: "+amount+" a la cuenta: "+account_id);
+      }, function (err) {
+        console.error(err);
+      });
+      //account_id, category_id, amount, description, timestamp, date, hour, day, week, month, year
+      var query = "INSERT INTO records (account_id, category_id, amount, sign, description, timestamp, date, hour, day, week, month, year) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+      $cordovaSQLite.execute(db,query, [account_id, category_id, amount, sign, description, timestamp, mydate, hour, day, week, month, year]).then(function(results) {
+        console.log("INSERT INTO RECORDS-> id: " +results.insertId+" acc: "+account_id+ " cat: "+category_id+" amount: "+amount+" sign: "+sign+" desc: "+description+" tstamp: "+timestamp+" date: "+mydate+" hour: "+hour+" day: "+day+" week: "+week+" month: "+month+" year: "+year);
+      }, function (err) {
+        console.error(err);
+      });
+    },
+    addExpense: function(account_id, category_id, amount, sign, description, timestamp, mydate, hour, day, week, month, year){
+      //agrega gastos y reduce el balance de la cuenta
+      var query = "UPDATE accounts SET expenses = (SELECT expenses FROM accounts WHERE id = ?)+?, balance = (SELECT balance FROM accounts WHERE id = ?)- ? WHERE id = ?";
+      console.log("query: "+query);
+      $cordovaSQLite.execute(db,query, [account_id, amount, account_id, amount, account_id]).then(function(results) {
+        console.log("GASTOS AGREGADOS: "+amount+" a la cuenta: "+account_id);
+      }, function (err) {
+        console.error(err);
+      });
+      //account_id, category_id, amount, description, timestamp, date, hour, day, week, month, year
+      var query = "INSERT INTO records (account_id, category_id, amount, sign, description, timestamp, date, hour, day, week, month, year) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+      $cordovaSQLite.execute(db,query, [account_id, category_id, amount, sign, description, timestamp, mydate, hour, day, week, month, year]).then(function(results) {
+        console.log("INSERT INTO RECORDS-> id: " +results.insertId+" acc: "+account_id+ " cat: "+category_id+" amount: "+amount+" sign: "+sign+" desc: "+description+" tstamp: "+timestamp+" date: "+mydate+" hour: "+hour+" day: "+day+" week: "+week+" month: "+month+" year: "+year);
       }, function (err) {
         console.error(err);
       });

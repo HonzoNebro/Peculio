@@ -26,42 +26,35 @@ angular.module('starter', ['ionic', 'ngCordova', 'starter.controllers', 'starter
     //$cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS test (date integer primary key, test text)");
 
     $cordovaSQLite.execute(db, "DROP TABLE IF EXISTS categories");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)");
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Alojamiento"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Coche"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Combustible"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Comidas Afuera"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Compras"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Entretenimiento"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Familia"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Hogar"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Impuestos"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Lectura"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Mascotas"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Niños"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Otros"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Regalos"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Ropa"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Salud"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Seguro"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Transporte"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (name) VALUES (?)", ["Zapatos"]);
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, category TEXT, sign TEXT, account TEXT)");
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Autopista", "¡", "Efectivo"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Bebidas", "¡", "Efectivo"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Comida", "¡", "Efectivo"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Gasolina", "¡", "Efectivo"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Hotel", "¡", "Efectivo"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Mercancia", "¡", "Efectivo"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Otros", "¡", "Efectivo"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Personales", "¡", "Efectivo"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Propinas", "¡", "Efectivo"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Sueldo", "ç", "Efectivo"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Ventas", "ç", "Efectivo"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Prestamo", "ç", "Efectivo"]);
+
     $cordovaSQLite.execute(db, "DROP TABLE IF EXISTS accounts");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS accounts (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)");
-    $cordovaSQLite.execute(db, "INSERT INTO accounts (name) VALUES (?)", ["Efectivo"]);
-    $cordovaSQLite.execute(db, "INSERT INTO accounts (name) VALUES (?)", ["Cuenta Corriente"]);
-    $cordovaSQLite.execute(db, "INSERT INTO accounts (name) VALUES (?)", ["Ahorros"]);
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS accounts (id INTEGER PRIMARY KEY AUTOINCREMENT, account TEXT, incomes REAL, expenses REAL, balance REAL)");
+    $cordovaSQLite.execute(db, "INSERT INTO accounts (account, incomes, expenses, balance) VALUES (?,?,?,?)", ["Efectivo", 0, 0, 0]);
+    $cordovaSQLite.execute(db, "INSERT INTO accounts (account, incomes, expenses, balance) VALUES (?,?,?,?)", ["Cuenta Corriente", 0, 0, 0]);
+    $cordovaSQLite.execute(db, "INSERT INTO accounts (account, incomes, expenses, balance) VALUES (?,?,?,?)", ["Ahorros", 0, 0, 0]);
+
     $cordovaSQLite.execute(db, "DROP TABLE IF EXISTS records");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS records (id INTEGER PRIMARY KEY AUTOINCREMENT, date INTEGER, operation TEXT, amount REAL, account_id INTEGER, category_id INTEGER, description TEXT, FOREIGN KEY (category_id) REFERENCES categories (id), FOREIGN KEY (account_id) REFERENCES accounts (id))");
-    $cordovaSQLite.execute(db, "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)", [1464062400,'Ingreso',100,1,1,'test']);
-    $cordovaSQLite.execute(db, "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)", [1464235200,'Gasto',-100,1,1,'test2']);
-    $cordovaSQLite.execute(db, "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)", [1464494400,'Ingreso',100,2,1,'test3']);
-    $cordovaSQLite.execute(db, "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)", [1464321600,'Gasto',-100,2,1,'test4']);
-    $cordovaSQLite.execute(db, "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)", [1464408000,'Ingreso',100,2,1,'test5']);
-    $cordovaSQLite.execute(db, "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)", [1464148800,'Ingreso',100,3,1,'test6']);
-    $cordovaSQLite.execute(db, "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)", [1464580800,'Ingreso',100,3,1,'test10']);
-    $cordovaSQLite.execute(db, "INSERT INTO records (date, operation, amount, account_id, category_id, description) VALUES (?,?,?,?,?,?)", [1464926400,'Gasto',-100,3,1,'test11']);
-  });
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS records (id INTEGER PRIMARY KEY AUTOINCREMENT, account_id INTEGER, category_id INTEGER, amount REAL, sign TEXT, description TEXT, timestamp INTEGER, date TEXT, hour TEXT, day TEXT, week TEXT, month TEXT, year TEXT, FOREIGN KEY (account_id) REFERENCES accounts (id), FOREIGN KEY (category_id) REFERENCES categories (id))");
+    $cordovaSQLite.execute(db, "INSERT INTO records (account_id, category_id, amount, sign, description, timestamp, date, hour, day, week, month, year) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", [1, 1, 100, "¡", "foo", 1465398998, "08/06/2016", "17:16:38", "8", "23", "6", "2016"]);
+    $cordovaSQLite.execute(db, "INSERT INTO records (account_id, category_id, amount, sign, description, timestamp, date, hour, day, week, month, year) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", [1, 2, 100, "¡", "foo2", 1465398998, "08/06/2016", "17:16:38", "8", "23", "6", "2016"]);
+    $cordovaSQLite.execute(db, "INSERT INTO records (account_id, category_id, amount, sign, description, timestamp, date, hour, day, week, month, year) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", [1, 3, 100, "¡", "foo3", 1465398998, "08/06/2016", "17:16:38", "8", "23", "6", "2016"]);
+    $cordovaSQLite.execute(db, "INSERT INTO records (account_id, category_id, amount, sign, description, timestamp, date, hour, day, week, month, year) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", [3, 22, 100, "ç", "foo4", 1465398998, "08/06/2016", "17:16:38", "8", "23", "6", "2016"]);
+    $cordovaSQLite.execute(db, "INSERT INTO records (account_id, category_id, amount, sign, description, timestamp, date, hour, day, week, month, year) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", [3, 23, 100, "ç", "foo5", 1465398998, "08/06/2016", "17:16:38", "8", "23", "6", "2016"]);
+    $cordovaSQLite.execute(db, "INSERT INTO records (account_id, category_id, amount, sign, description, timestamp, date, hour, day, week, month, year) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", [3, 24, 100, "ç", "foo6", 1465398998, "08/06/2016", "17:16:38", "8", "23", "6", "2016"]);
+  }); 
 })
 
 .config(function (ionicDatePickerProvider) {
@@ -103,20 +96,20 @@ angular.module('starter', ['ionic', 'ngCordova', 'starter.controllers', 'starter
     }
   })
 
-  .state('app.ingreso', {
-    url: '/ingreso',
+  .state('app.regExpense', {
+    url: '/regExpense',
     views: {
       'menuContent': {
-        templateUrl: 'templates/ingreso.html'
+        templateUrl: 'templates/regExpense.html'
       }
     }
   })
 
-  .state('app.gasto', {
-    url: '/gasto',
+  .state('app.regIncome', {
+    url: '/regIncome',
     views: {
       'menuContent': {
-        templateUrl: 'templates/gasto.html'
+        templateUrl: 'templates/regIncome.html'
       }
     }
   })
