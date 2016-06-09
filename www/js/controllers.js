@@ -263,7 +263,7 @@ controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory
       year = mydate.getFullYear();
     }
     var amount = $scope.operation.amo;
-    var sign = "¡";
+    var sign = "Gasto";
     var account_id = $scope.operation.acc;
     var category_id = $scope.operation.catExpense;
     if ($scope.operation.des == null){
@@ -288,7 +288,7 @@ controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory
       year = mydate.getFullYear();
     }
     var amount = $scope.operation.amo;
-    var sign = "ç";
+    var sign = "Ingreso";
     var account_id = $scope.operation.acc;
     var category_id = $scope.operation.catIncome;
     if ($scope.operation.des == null){
@@ -327,7 +327,7 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
 
   var calendarTo = {
     callback: function (val) {  //Mandatory
-      console.log('Return value from the datepicker popup is : ' + val/1000 + " " + new Date(val));
+      console.log('Return value from the datepicker popup is : ' + val + " " + new Date(val));
         //$scope.from = new Date(val).toDateString();
         var date = new Date(val);
         $scope.to = "" + date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear();
@@ -346,7 +346,7 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
 
   $scope.fill = function(){
     $scope.records = sqliteMovementsFactory.selectMovements($scope.mov.account, from, to);
-    var record = $scope.records;
+  };
     
     /*$timeout(function () {
       console.log("dentro Angularfill(): "+angular.toJson(record));
@@ -359,7 +359,6 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
       //console.log("dentro fill4(): "+record[1]);
     }, 50);*/
     
-  }
 
   $scope.erase = function($index){
     console.log("borrando: "+$scope.records[$index].id);
@@ -368,12 +367,12 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
     $ionicListDelegate.closeOptionButtons();
     /*
     borrar de registro de BBDD */
-  }
+  };
 
   $scope.$on("$ionicView.enter", function () {
     $scope.accounts = [];
     $scope.accounts = sqliteAccountsFactory.selectAccounts();
-    $scope.records = sqliteMovementsFactory.selectMovements(0, 0, 16725225600);
+    $scope.records = sqliteMovementsFactory.selectMovements(0, 0, 16725225600000);
     $timeout(function () {
       $scope.accounts.unshift({id: 0, name: 'Todas'});
       $scope.mov = {
@@ -409,34 +408,8 @@ controllers.controller("ChartsCtrl", function($scope, sqliteMovementsFactory, $t
     start.setDate(start.getDate() + 1);
     console.log("start: "+start+ " i= "+i);*/
 //}
-
-  var temp = sqliteMovementsFactory.selectBalanceAcc(start, end);
-  $timeout(function () {
-    console.log("temp: "+temp);
-    console.log("temp: "+angular.toJson(temp));
-  }, 500);
-
-  $timeout(function () {
-    var groups = {};
-    $.each(temp, function(i, item) {
-        var cuenta = item.cuenta;
-
-        delete item.cuenta;
-
-        if(groups[cuenta]) {
-            groups[cuenta].push(item);
-        } else {
-            groups[cuenta] = [item];
-        }
-    });
-    var result = $.map(groups, function(group, key) {
-        var obj = {};
-        obj[key] = group;
-
-        return obj;
-    });
-    console.log("result: "+angular.toJson(result));
-  }, 500);
+  var pieGasto;
+  var pieIngreso;
 
 //areachart balance
   $scope.chartarea = {
@@ -505,23 +478,20 @@ controllers.controller("ChartsCtrl", function($scope, sqliteMovementsFactory, $t
   }
 
 //piechart categorias
-
-var temp2 = sqliteMovementsFactory.selectBalanceCat(start, end);
-  
-
+//gasto
+pieGasto= sqliteMovementsFactory.selectBalanceCat("Gasto");
 $timeout(function () {
-    console.log("temp2: "+temp2);
-    console.log("temp2: "+angular.toJson(temp2));
-  $scope.chartpie = {
+  $scope.chartpieGasto = {
     options: {
       chart: {
         type: 'pie',
       },
       title: {
-        text: 'Navegadores',
+        text: 'Gastos por Categoría',
       },
       tooltip: {
-        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+         //pointFormat: '{series.name} produced <b>{point.y:,.0f}</b><br/>warheads in {point.x}'
+        pointFormat: '{series.name}: <b>{point.y}€, {point.percentage:.1f}%</b>'
       },
       plotOptions: {
         pie: {
@@ -538,32 +508,46 @@ $timeout(function () {
       enabled: false
     },
     "series": [{
-      name: 'Balance',
+      name: 'Gastos',
       colorByPoint: true,
-      data: temp2
-      /*
-      data: [{
-        name: 'Internet Explorer',
-        y: 5.8
-      }, {
-        name: 'Chrome',
-        y: 70.4,
-        sliced: true,
-        selected: true
-      }, {
-        name: 'Firefox',
-        y: 17.5
-      }, {
-        name: 'Safari',
-        y: 3.7
-      }, {
-        name: 'Opera',
-        y: 1.3
-      }, {
-        name: 'Proprietary or Undetectable',
-        y: 0.2
-      }]*/
+      data: pieGasto
     }]
   }
-}, 500);
+}, 50);
+
+//ingreso
+pieIngreso= sqliteMovementsFactory.selectBalanceCat("Ingreso");
+$timeout(function () {
+  $scope.chartpieIngreso = {
+    options: {
+      chart: {
+        type: 'pie',
+      },
+      title: {
+        text: 'Ingresos por Categoría',
+      },
+      tooltip: {
+        pointFormat: '{series.name}: <b>{point.y}€, {point.percentage:.1f}%</b>'
+      },
+      plotOptions: {
+        pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
+          dataLabels: {
+              enabled: false
+          },
+          showInLegend: true
+        }
+      },
+    },
+    credits: {
+      enabled: false
+    },
+    "series": [{
+      name: 'Ingresos',
+      colorByPoint: true,
+      data: pieIngreso
+    }]
+  }
+}, 50);
 });
