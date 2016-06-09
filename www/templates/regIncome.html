@@ -1,10 +1,10 @@
-<ion-view view-title="Agregar Gastos" ng-controller="OperationCtrl">
+<ion-view view-title="Agregar Saldo" ng-controller="OperationCtrl">
   <ion-content class="padding">
     <div>
       <button class="button button-small button-balanced padding" ng-click="chooseDate()">personalizar fecha</button>
     </div>
     <div>
-      <input type="text" placeholder="fecha" ng-model="operation.date")
+      <input type="text" placeholder="fecha" ng-model="operation.date">
     </div>
 
     <div class="item item-input">
@@ -18,29 +18,27 @@
       </div>
 
     <label class="item item-input item-select">
-        <div class="input-label">
-          Cuenta:
-        </div>
-        <select ng-model='operation.acc' ng-options="account.id as account.name for account in accounts"></select>
-      </label>
-
-      <div class="button-bar padding">
-        <a href="#/app/addCategory" class="button" >agregar categoria</a>
+    <div class="input-label">
+      Cuenta:
       </div>
-
-      <label class="item item-input item-select">
-        <div class="input-label">
-          Categoría:
-        </div>
-        <select ng-model='operation.cat' ng-options="category.id as category.name for category in categories"></select>
-      </label>
+        <select ng-model='operation.acc' ng-options="account.id as account.name for account in accounts"></select>
+        </label>
+      <div class="button-bar padding">
+      <a href="#/app/addCategory" class="button" >agregar categoria</a>
+    </div>
+    <label class="item item-input item-select">
+      <div class="input-label">
+        Categoría:
+      </div>
+      <select ng-model='operation.catIncome' ng-options="category.id as category.name for category in categoriesPlus"></select>
+    </label>
 
       <label class="item item-input">
       <input type="text" placeholder="Escriba una descripción breve" ng-model="operation.des">
     </label>
 
     <div>
-      <button class="button button-small button-balanced padding" ng-disabled="!operation.amo || !operation.acc || !operation.cat" ng-click="insertRecExp()">Hecho</button>
+      <button class="button button-small button-balanced padding" ng-disabled="!operation.amo || !operation.acc || !operation.catIncome" ng-click="addBalance()">Hecho</button>
     </div>
   <!--
     <div>

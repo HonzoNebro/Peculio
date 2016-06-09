@@ -163,7 +163,7 @@ controllers.controller("AppCtrl", function($scope, $ionicNavBarDelegate, $ionicP
 });
 
 //controlador operaciones
-controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory, sqliteRecordsFactory, sqliteAccountsFactory, sqliteCategoriesFactory, ionicDatePicker, userService, $ionicModal) {
+controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory, sqliteRecordsFactory, sqliteAccountsFactory, sqliteCategoriesFactory, sqliteMovementsFactory, ionicDatePicker, userService, $ionicModal) {
   //console.log("entro operationCtrl");
   $scope.operation = {};
   $scope.operation.amo ="";
@@ -183,18 +183,20 @@ controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory
     $scope.modal.show();
   };
 
-  var date;
 //mirar movements, y comprar con este select, este no va bien
   $scope.$on("$ionicView.enter", function () {
     $scope.accounts = {};
     $scope.accounts = sqliteAccountsFactory.selectAccounts();
-    $scope.categories = {};
-    $scope.categories = sqliteCategoriesFactory.selectCategories();
+    $scope.categoriesMinus = {};
+    $scope.categoriesMinus = sqliteCategoriesFactory.selectCategoriesMinus();
+    $scope.categoriesPlus = {};
+    $scope.categoriesPlus = sqliteCategoriesFactory.selectCategoriesPlus();
     $timeout(function () {
       //console.log(angular.toJson($scope.accounts[0]));
       //console.log("impimir " + $scope.accounts[0].name)
         $scope.operation.acc = $scope.accounts[0];
-        $scope.operation.cat = $scope.categories[0];
+        $scope.operation.catIncome = $scope.categoriesPlus[0];
+        $scope.operation.catExpense = $scope.categoriesMinus[0];
       //console.log("id: " + $scope.operation.acc.id + " name: " + $scope.operation.acc.name)
     }, 50);
   });
@@ -217,59 +219,88 @@ controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory
     sqliteRecordsFactory.selectRecords();
   }
 
-  $scope.insertRecInc = function(){
-    if($scope.operation.date == null){
-      date = Math.floor(Date.now()/1000);
-    }
-    var operation = "Ingreso";
-    var amount = $scope.operation.amo;
-    var account_id = $scope.operation.acc;
-    var category_id = $scope.operation.cat;
-    if ($scope.operation.des == null){
-      $scope.operation.des = "";
-    }
-    var description = $scope.operation.des;
-    //console.log($scope.operation.acc)
-    //console.log("cat: "+ category_id + "acc: " + account_id)
-    sqliteRecordsFactory.insertRecord(date, operation, amount, account_id, category_id, description);
-    $timeout(function () {
-      $scope.operation.amo = "";
-      $scope.operation.des = "";
-    }, 50);
-  }
+  var mydate;
+  var timestamp;
+  var day;
+  var hour;
+  var week;
+  var month;
+  var year;
 
-  $scope.insertRecExp = function(){
-    if($scope.operation.date == null){
-      date = Math.floor(Date.now()/1000);
-    }
-    var operation = "Gasto";
-    var amount = "-"+$scope.operation.amo;
-    var account_id = $scope.operation.acc;
-    var category_id = $scope.operation.cat;
-    if ($scope.operation.des == null){
-      $scope.operation.des = "";
-    }
-    var description = $scope.operation.des;
-    sqliteRecordsFactory.insertRecord(date, operation, amount, account_id, category_id, description);
-    $timeout(function () {
-      $scope.operation.amo = "";
-      $scope.operation.des = "";
-    }, 50);
+  Date.prototype.getWeek = function() {
+    var onejan = new Date(this.getFullYear(),0,1);
+    return Math.ceil((((this - onejan) / 86400000) + onejan.getDay()+1)/7);
   }
 
   var calendarFrom = {
     callback: function (val) {  //Mandatory
-      console.log('Return value from the datepicker popup is : ' + Math.floor(val/1000) +","+new Date(val));
-        date = Math.floor(val/1000);
+      console.log('Return value from the datepicker popup is : ' + val +","+new Date(val));
+        timestamp = val;
         mydate = new Date(val);
+        hour = mydate.toLocaleTimeString();
+        day = mydate.getDate();
+        week = mydate.getWeek();
+        month = mydate.getMonth()+1;
+        year = mydate.getFullYear();
         $scope.operation.date = "" + mydate.getDate() + "/" + (mydate.getMonth()+1) + "/" + mydate.getFullYear();
-        //$scope.operation.date = date;
     }
   };
 
   $scope.chooseDate = function(){
     ionicDatePicker.openDatePicker(calendarFrom);
   };
+
+    //INSERT INTO records (account_id, category_id, amount, description, timestamp, date, hour, day, week, month, year)
+    // VALUES (?,?,?,?,?,?,?,?,?,?,?)", [1, 1, 100, "foo", 1465398998, "08/06/2016", "17:16:38", "8", "23", "6", "2016"]);
+  $scope.addExpense = function(){
+    if($scope.operation.date == null){
+      mydate = new Date(new Date);
+      timestamp = mydate.getTime();
+      hour = mydate.toLocaleTimeString();
+      day = mydate.getDate();
+      week = mydate.getWeek();
+      month = mydate.getMonth()+1;
+      year = mydate.getFullYear();
+    }
+    var amount = $scope.operation.amo;
+    var sign = "Gasto";
+    var account_id = $scope.operation.acc;
+    var category_id = $scope.operation.catExpense;
+    if ($scope.operation.des == null){
+      $scope.operation.des = "";
+    }
+    var description = $scope.operation.des;
+    sqliteMovementsFactory.addExpense(account_id, category_id, amount, sign, description, timestamp, mydate, hour, day, week, month, year);
+    $timeout(function () {
+      $scope.operation.amo = "";
+      $scope.operation.des = "";
+    }, 50);
+  }
+
+    $scope.addBalance= function(){
+    if($scope.operation.date == null){
+      mydate = new Date(new Date);
+      timestamp = mydate.getTime();
+      hour = mydate.toLocaleTimeString();
+      day = mydate.getDate();
+      week = mydate.getWeek();
+      month = mydate.getMonth()+1;
+      year = mydate.getFullYear();
+    }
+    var amount = $scope.operation.amo;
+    var sign = "Ingreso";
+    var account_id = $scope.operation.acc;
+    var category_id = $scope.operation.catIncome;
+    if ($scope.operation.des == null){
+      $scope.operation.des = "";
+    }
+    var description = $scope.operation.des;
+    sqliteMovementsFactory.addBalance(account_id, category_id, amount, sign, description, timestamp, mydate, hour, day, week, month, year);
+    $timeout(function () {
+      $scope.operation.amo = "";
+      $scope.operation.des = "";
+    }, 50);
+  }
 
   //console.log("$scope.operation.amo en ingreso: "+$scope.operation.amo);
  
@@ -285,23 +316,23 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
   //$scope.listCanSwipe = true no usado, está ya en true
   var calendarFrom = {
     callback: function (val) {  //Mandatory
-      console.log('Return value from the datepicker popup is : ' + Math.floor(val/1000) + " " + new Date(val));
+      console.log('Return value from the datepicker popup is : ' + val + " " + new Date(val));
         //$scope.from = new Date(val).toDateString();
         var date = new Date(val);
         $scope.from = "" + date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear();
-        from = Math.floor(val/1000);
+        from = val;
         //fill(date, Date.now());
     }
   };
 
   var calendarTo = {
     callback: function (val) {  //Mandatory
-      console.log('Return value from the datepicker popup is : ' + Math.floor(val/1000) + " " + new Date(val));
+      console.log('Return value from the datepicker popup is : ' + val + " " + new Date(val));
         //$scope.from = new Date(val).toDateString();
         var date = new Date(val);
         $scope.to = "" + date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear();
         //fill($scope.from, $scope.to);
-        to = Math.floor(val/1000);
+        to = val;
     }
   };
 
@@ -315,7 +346,7 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
 
   $scope.fill = function(){
     $scope.records = sqliteMovementsFactory.selectMovements($scope.mov.account, from, to);
-    var record = $scope.records;
+  };
     
     /*$timeout(function () {
       console.log("dentro Angularfill(): "+angular.toJson(record));
@@ -328,7 +359,6 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
       //console.log("dentro fill4(): "+record[1]);
     }, 50);*/
     
-  }
 
   $scope.erase = function($index){
     console.log("borrando: "+$scope.records[$index].id);
@@ -337,12 +367,12 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
     $ionicListDelegate.closeOptionButtons();
     /*
     borrar de registro de BBDD */
-  }
+  };
 
   $scope.$on("$ionicView.enter", function () {
     $scope.accounts = [];
     $scope.accounts = sqliteAccountsFactory.selectAccounts();
-    $scope.records = sqliteMovementsFactory.selectMovements(0, 0, 16725225600);
+    $scope.records = sqliteMovementsFactory.selectMovements(0, 0, 16725225600000);
     $timeout(function () {
       $scope.accounts.unshift({id: 0, name: 'Todas'});
       $scope.mov = {
@@ -363,7 +393,7 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
 
 });
 
-controllers.controller("ChartsCtrl", function($scope, sqliteRecordsFactory, $timeout){
+controllers.controller("ChartsCtrl", function($scope, sqliteMovementsFactory, $timeout){
   // hace dos semanas -> new Date(+new Date - 12096e5);
   var start = new Date(+new Date - 12096e5);
   start.setHours(0, 0, 0, 0);
@@ -377,17 +407,11 @@ controllers.controller("ChartsCtrl", function($scope, sqliteRecordsFactory, $tim
 /*console.log("start: "+start+ " i= "+i);
     start.setDate(start.getDate() + 1);
     console.log("start: "+start+ " i= "+i);*/
+//}
+  var pieGasto;
+  var pieIngreso;
 
-  var temp = {};
-  for(i=0; i<14; i++){
-    temp = sqliteRecordsFactory.selectBalance(start, end);
-    start.setDate(start.getDate() + 1);
-    $timeout(function () {
-      console.log("temp: "+temp);
-      console.log("temp: "+angular.toJson(temp));
-    }, 5000);
-  }
-
+//areachart balance
   $scope.chartarea = {
     options: {
       chart: {
@@ -452,4 +476,78 @@ controllers.controller("ChartsCtrl", function($scope, sqliteRecordsFactory, $tim
       "data": [25.56, 64, 27, 70, 10, 50, 25.56, 64, 27, 70, 10, 50, 25.56, 64]
     }],
   }
+
+//piechart categorias
+//gasto
+pieGasto= sqliteMovementsFactory.selectBalanceCat("Gasto");
+$timeout(function () {
+  $scope.chartpieGasto = {
+    options: {
+      chart: {
+        type: 'pie',
+      },
+      title: {
+        text: 'Gastos por Categoría',
+      },
+      tooltip: {
+         //pointFormat: '{series.name} produced <b>{point.y:,.0f}</b><br/>warheads in {point.x}'
+        pointFormat: '{series.name}: <b>{point.y}€, {point.percentage:.1f}%</b>'
+      },
+      plotOptions: {
+        pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
+          dataLabels: {
+              enabled: false
+          },
+          showInLegend: true
+        }
+      },
+    },
+    credits: {
+      enabled: false
+    },
+    "series": [{
+      name: 'Gastos',
+      colorByPoint: true,
+      data: pieGasto
+    }]
+  }
+}, 50);
+
+//ingreso
+pieIngreso= sqliteMovementsFactory.selectBalanceCat("Ingreso");
+$timeout(function () {
+  $scope.chartpieIngreso = {
+    options: {
+      chart: {
+        type: 'pie',
+      },
+      title: {
+        text: 'Ingresos por Categoría',
+      },
+      tooltip: {
+        pointFormat: '{series.name}: <b>{point.y}€, {point.percentage:.1f}%</b>'
+      },
+      plotOptions: {
+        pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
+          dataLabels: {
+              enabled: false
+          },
+          showInLegend: true
+        }
+      },
+    },
+    credits: {
+      enabled: false
+    },
+    "series": [{
+      name: 'Ingresos',
+      colorByPoint: true,
+      data: pieIngreso
+    }]
+  }
+}, 50);
 });

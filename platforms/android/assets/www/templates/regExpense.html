@@ -1,0 +1,46 @@
+<ion-view view-title="Registrar Gasto" ng-controller="OperationCtrl">
+  <ion-content class="padding">
+
+    <div class="item item-input">
+      <input type="tel" placeholder="Ingreso" ng-model="operation.amo">
+      <!--<a href="#/app/calculadora" class="button button-icon icon ion-calculator"></a>-->
+      <button class="button button-icon icon ion-calculator" ng-click="openModal()"></button>
+    </div>
+    <div class="button-bar padding">
+        <a href="#/app/addAccount" class="button" >Nueva Cuenta</a>
+      </div>
+    <label class="item item-input item-select">
+        <div class="input-label">
+          Cuenta:
+        </div>
+        <select ng-model='operation.acc' ng-options="account.id as account.name for account in accounts"></select>
+      </label>
+      <div class="button-bar padding">
+        <a href="#/app/addCategory" class="button" >Nueva Categoria</a>
+      </div>
+
+      <label class="item item-input item-select">
+        <div class="input-label">
+          Categoría:
+        </div>
+        <select ng-model='operation.catExpense' ng-options="category.id as category.name for category in categoriesMinus"></select>
+      </label>
+      <label class="item item-input">
+      <input type="text" placeholder="Escriba una descripción breve" ng-model="operation.des">
+    </label>
+    <div>
+      <button class="button button-small  button-balanced padding" ng-click="chooseDate()">personalizar fecha</button>
+      <input type="text" placeholder="fecha" ng-model="operation.date">
+    </div>
+
+  	<div>
+  		<button class="button button-small  button-balanced padding" ng-disabled="!operation.amo || !operation.acc || !operation.catExpense" ng-click="addExpense()">Hecho</button>
+  	</div>
+  <!--
+  	<div>
+  		<button class="button button-balanced padding" ng-click="selectRec()">select records</button>
+  		<button class="button button-balanced padding" ng-click="selectCat()">select cat</button>
+  	</div>
+  -->
+  </ion-content>
+</ion-view>
