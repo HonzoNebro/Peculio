@@ -1,21 +1,20 @@
 <ion-view view-title="Agregar Saldo" ng-controller="OperationCtrl">
   <ion-content class="padding">
-    <div>
-      <button class="button button-small button-balanced padding" ng-click="chooseDate()">personalizar fecha</button>
-    </div>
-    <div>
-      <input type="text" placeholder="fecha" ng-model="operation.date">
+  <div class="card">
+    
+    <div class="item item-input">
+      <input type="text" placeholder="Personalizar Fecha" ng-model="operation.date" ng-click="chooseDate()">
     </div>
 
     <div class="item item-input">
-      <input type="tel" placeholder="Gasto" ng-model="operation.amo">
+      <input type="tel" placeholder="Cantidad" ng-model="operation.amo">
       <!--<a href="#/app/calculadora" class="button button-icon icon ion-calculator"></a>-->
       <button class="button button-icon icon ion-calculator" ng-click="openModal()"></button>
     </div>
 
-    <div class="button-bar padding">
+    <!--<div class="button-bar padding">
         <a href="#/app/addAccount" class="button" >agregar cuenta</a>
-      </div>
+    </div>-->
 
     <label class="item item-input item-select">
     <div class="input-label">
@@ -23,9 +22,9 @@
       </div>
         <select ng-model='operation.acc' ng-options="account.id as account.name for account in accounts"></select>
         </label>
-      <div class="button-bar padding">
+      <!--<div class="button-bar padding">
       <a href="#/app/addCategory" class="button" >agregar categoria</a>
-    </div>
+    </div>-->
     <label class="item item-input item-select">
       <div class="input-label">
         Categoría:
@@ -36,9 +35,9 @@
       <label class="item item-input">
       <input type="text" placeholder="Escriba una descripción breve" ng-model="operation.des">
     </label>
-
+  </div>
     <div>
-      <button class="button button-small button-balanced padding" ng-disabled="!operation.amo || !operation.acc || !operation.catIncome" ng-click="addBalance()">Hecho</button>
+      <button class="button button-block button-positive padding" ng-disabled="!operation.amo || !operation.acc || !operation.catIncome" ng-click="addBalance()">Registrar Ingreso</button>
     </div>
   <!--
     <div>

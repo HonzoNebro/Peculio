@@ -9,16 +9,25 @@
           Año/s: <select ng-model="mov.year" ng-options="year.id as year.name for year in years" ng-change="change()"></select>
         </ion-item>
       -->
-      <ion-item><button class="button button-small button-balanced padding" ng-click="fromBtn()">Desde</button> {{from}}<button class="button button-small button-balanced padding" ng-click="toBtn()">Hasta</button> {{to}}<button class="button button-small button-balanced padding" ng-click="fill()">GOES</button></ion-item>
+      <div class="card">
+        <label class="item item-input">
+          <input type="text" placeholder="Desde" ng-model="from" ng-click="fromBtn()">
+        </label>
+        <label class="item item-input">
+          <input type="text" placeholder="Hasta" ng-model="to" ng-click="toBtn()">
+        </label>
+      </div>
+
+        <button class="button button-block button-positive padding" ng-click="fill()">Filtrar Movimientos</button>
 
   	<ion-list can-swipe="true">
       <ion-item collection-repeat="record in records">
-        Fecha: {{record.date}}</br>
-        Cuenta: {{record.account}}</br>
-        Cantidad: {{record.amount}}€</br>
-        Categoría: {{record.category}}</br>
-        Tipo de movimiento: {{record.operation}}</br>
-        Balance: {{record.balance}}
+        Fecha: <b>{{record.date}}</b></br>
+        Cuenta: <b>{{record.account}}</b></br>
+        Cantidad: <b>{{record.amount}}€</b></br>
+        Categoría: <b>{{record.category}}</b></br>
+        Tipo de movimiento: <b>{{record.operation}}</b></br>
+        Balance: <b>{{record.balance}}</b>
         <!--<ion-option-button class="button-small button-positive" ng-click="share(item)">Compartir</ion-option-button>-->
         <ion-option-button class="button-small button-assertive" ng-click="erase($index)">Eliminar</ion-option-button>
       </ion-item>

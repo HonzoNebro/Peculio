@@ -172,7 +172,7 @@ controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory
   };
   console.log("amo: "+$scope.operation.amo)*/
 
-  $ionicModal.fromTemplateUrl('templates/calculadora.html',{
+  $ionicModal.fromTemplateUrl('templates/modalCalc.html',{
     scope: $scope,
     animation: 'slide-in-up',
   }).then(function(modal){
@@ -313,6 +313,7 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
   var to;
   $scope.shouldShowDelete = false;
   $scope.shouldShowReorder = false;
+  $scope.records = {};
   //$scope.listCanSwipe = true no usado, está ya en true
   var calendarFrom = {
     callback: function (val) {  //Mandatory
@@ -323,6 +324,9 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
         from = val;
         //fill(date, Date.now());
     }
+  };
+  $scope.fromBtn = function(){
+    ionicDatePicker.openDatePicker(calendarFrom);
   };
 
   var calendarTo = {
@@ -335,16 +339,14 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
         to = val;
     }
   };
-
-  $scope.fromBtn = function(){
-    ionicDatePicker.openDatePicker(calendarFrom);
-  };
-
   $scope.toBtn = function(){
     ionicDatePicker.openDatePicker(calendarTo);
   };
 
+
+
   $scope.fill = function(){
+    console.log("acc"+$scope.mov.account);
     $scope.records = sqliteMovementsFactory.selectMovements($scope.mov.account, from, to);
   };
     
@@ -393,6 +395,172 @@ controllers.controller("MovementsCtrl", function($timeout, $scope, sqliteAccount
 
 });
 
+controllers.controller("TransfersCtrl", function($scope, $timeout, $ionicHistory, sqliteRecordsFactory, sqliteAccountsFactory, sqliteCategoriesFactory, sqliteMovementsFactory, ionicDatePicker, userService, $ionicModal) {
+  //console.log("entro operationCtrl");
+  $scope.operation = {};
+  $scope.operation.amo ="";
+  /*$scope.operation = {
+    amo: "0"
+  };
+  console.log("amo: "+$scope.operation.amo)*/
+
+//mirar movements, y comprar con este select, este no va bien
+  $scope.$on("$ionicView.enter", function () {
+    $scope.accounts = {};
+    $scope.accounts = sqliteAccountsFactory.selectAccounts();
+    $timeout(function () {
+      //console.log(angular.toJson($scope.accounts[0]));
+      //console.log("impimir " + $scope.accounts[0].name)
+        $scope.operation.originAcc = $scope.accounts[0];
+        $scope.operation.targetAcc = $scope.accounts[0];
+      //console.log("id: " + $scope.operation.acc.id + " name: " + $scope.operation.acc.name)
+    }, 50);
+  });
+
+  var mydate;
+  var timestamp;
+  var day;
+  var hour;
+  var week;
+  var month;
+  var year;
+
+  Date.prototype.getWeek = function() {
+    var onejan = new Date(this.getFullYear(),0,1);
+    return Math.ceil((((this - onejan) / 86400000) + onejan.getDay()+1)/7);
+  }
+
+  var calendarFrom = {
+    callback: function (val) {  //Mandatory
+      console.log('Return value from the datepicker popup is : ' + val +","+new Date(val));
+        timestamp = val;
+        mydate = new Date(val);
+        hour = mydate.toLocaleTimeString();
+        day = mydate.getDate();
+        week = mydate.getWeek();
+        month = mydate.getMonth()+1;
+        year = mydate.getFullYear();
+        $scope.operation.date = "" + mydate.getDate() + "/" + (mydate.getMonth()+1) + "/" + mydate.getFullYear();
+    }
+  };
+
+  $scope.chooseDate = function(){
+    ionicDatePicker.openDatePicker(calendarFrom);
+  };
+
+
+  $scope.transfer= function(){
+    if($scope.operation.date == null){
+      mydate = new Date(new Date);
+      timestamp = mydate.getTime();
+      hour = mydate.toLocaleTimeString();
+      day = mydate.getDate();
+      week = mydate.getWeek();
+      month = mydate.getMonth()+1;
+      year = mydate.getFullYear();
+    }
+    var amount = $scope.operation.amo;
+    var originSign = "Gasto";
+    var targetSign = "Ingreso";
+    var originAccount = $scope.operation.originAcc;
+    var targetAccount = $scope.operation.targetAcc;
+    var category_id = 13; // 13 = nombre transferencia, signo transferencia
+    if ($scope.operation.des == null){
+      $scope.operation.des = "";
+    }
+    var description = $scope.operation.des;
+    sqliteMovementsFactory.addTransfer(originAccount, targetAccount, category_id, amount, originSign, targetSign, description, timestamp, mydate, hour, day, week, month, year);
+    $timeout(function () {
+      $scope.operation.amo = "";
+      $scope.operation.des = "";
+    }, 50);
+  }
+
+  //console.log("$scope.operation.amo en ingreso: "+$scope.operation.amo);
+ 
+});
+
+controllers.controller("AutomaticCtrl", function($scope, $ionicModal) {
+
+  $ionicModal.fromTemplateUrl('templates/modalAutomatic.html',{
+    scope: $scope,
+    animation: 'slide-in-up',
+  }).then(function(modal){
+    $scope.modal = modal;
+  })
+
+  $scope.openModal = function() {
+    $scope.modal.show();
+  };
+ 
+});
+
+controllers.controller("modalAutomaticCtrl", function($scope, ionicDatePicker, sqliteAccountsFactory, sqliteCategoriesFactory) {
+  $scope.auto = {};
+
+  $scope.auto = [
+    { toggle: "true", checked: true }
+  ];
+
+  $scope.auto.radio = [
+    { value: "Ingreso" },
+    { value: "Gasto" }
+  ];
+
+  $scope.radioChange = function(item){
+    console.log("radioChange: "+item.value);
+  };
+
+  Date.prototype.getWeek = function() {
+    var onejan = new Date(this.getFullYear(),0,1);
+    return Math.ceil((((this - onejan) / 86400000) + onejan.getDay()+1)/7);
+  }
+
+  var calendarFrom = {
+    callback: function (val) {  //Mandatory
+      console.log('Return value from the datepicker popup is : ' + val +","+new Date(val));
+        timestamp = val;
+        mydate = new Date(val);
+        hour = mydate.toLocaleTimeString();
+        day = mydate.getDate();
+        week = mydate.getWeek();
+        month = mydate.getMonth()+1;
+        year = mydate.getFullYear();
+        $scope.auto.date = "" + mydate.getDate() + "/" + (mydate.getMonth()+1) + "/" + mydate.getFullYear();
+    }
+  };
+
+  $scope.chooseDate = function(){
+    ionicDatePicker.openDatePicker(calendarFrom);
+  };
+
+  //repetir
+  $scope.numbers = [];
+  for (var i = 0; i < 10; i++){
+    $scope.numbers.push({value: i});
+  };
+  //se guarda en $scope.numbers.selected
+
+  $scope.$on("$ionicView.enter", function () {
+    $scope.auto.accounts = {};
+    $scope.auto.accounts = sqliteAccountsFactory.selectAccounts();
+    $scope.auto.categoriesMinus = {};
+    $scope.auto.categoriesMinus = sqliteCategoriesFactory.selectCategoriesMinus();
+    $scope.auto.categoriesPlus = {};
+    $scope.auto.categoriesPlus = sqliteCategoriesFactory.selectCategoriesPlus();
+    $timeout(function () {
+      //console.log(angular.toJson($scope.accounts[0]));
+      //console.log("impimir " + $scope.accounts[0].name)
+        $scope.auto.acc = $scope.auto.accounts[0];
+        $scope.auto.catIncome = $scope.auto.categoriesPlus[0];
+        $scope.auto.catExpense = $scope.auto.categoriesMinus[0];
+      //console.log("id: " + $scope.operation.acc.id + " name: " + $scope.operation.acc.name)
+    }, 50);
+  });
+
+
+});
+
 controllers.controller("ChartsCtrl", function($scope, sqliteMovementsFactory, $timeout){
   // hace dos semanas -> new Date(+new Date - 12096e5);
   var start = new Date(+new Date - 12096e5);
@@ -408,74 +576,78 @@ controllers.controller("ChartsCtrl", function($scope, sqliteMovementsFactory, $t
     start.setDate(start.getDate() + 1);
     console.log("start: "+start+ " i= "+i);*/
 //}
+  var areaBalance;
   var pieGasto;
   var pieIngreso;
 
 //areachart balance
-  $scope.chartarea = {
-    options: {
-      chart: {
-        type: 'area',
-      },
-      title: {
-        text: 'Balance',
-      },
-      xAxis: {
-        type: 'datetime',
-        dateTimeLabelFormats: { // don't display the dummy year
-          month: '%e. %b',
-          year: '%b'
-        }
-      },
-      plotOptions: {
-        area: {
-          marker: {
-            enabled: true,
-            symbol: 'circle',
-            radius: 2,
-            states: {
-              hover: {
-                enabled: true
-              }
-            }
+
+  //areaBalance = sqliteMovementsFactory.selectBalanceAcc();
+  $timeout(function () {
+  console.log("areaBalance: "+angular.toJson(areaBalance));
+    $scope.chartarea = {
+      options: {
+        chart: {
+          type: 'area',
+        },
+        title: {
+          text: 'Balance de las cuentas',
+        },
+        xAxis: {
+          type: 'datetime',
+          dateTimeLabelFormats: { // don't display the dummy year
+            month: '%e. %b',
+            year: '%b'
           }
         },
-        series: {
-          pointStart: Date.UTC(year, month, day),
-          pointInterval: 24 * 3600 * 1000 // one day
+        plotOptions: {
+          area: {
+            marker: {
+              enabled: true,
+              symbol: 'circle',
+              radius: 2,
+              states: {
+                hover: {
+                  enabled: true
+                }
+              }
+            }
+          },
+          series: {
+            pointStart: Date.UTC(year, month, day),
+            pointInterval: 24 * 3600 * 1000 // one day
+          }
+        },
+        tooltip: {
+          pointFormat: '{series.name}: <b>{point.y}€</b><br/>'
+        },
+      },
+      yAxis: {
+        title: {
+          text: 'Euros (€)'
+        },
+        labels: {
+          formatter: function() {
+            return this.value + '€';
+          }
         }
       },
-      tooltip: {
-        pointFormat: '{series.name}: <b>{point.y}€</b><br/>'
+      credits: {
+        enabled: false
       },
-    },
-    yAxis: {
-      title: {
-        text: 'Euros (€)'
-      },
-      labels: {
-        formatter: function() {
-          return this.value + '€';
-        }
-      }
-    },
-    credits: {
-      enabled: false
-    },
-    "series": [{
-      "name": "Ahorros",
-      "data": [50, 60, 70, 50, 60, 70, 50, 60, 70, 50, 60, 70, 50, 60]
-    }, {
-      "name": "Metalico",
-      "data": [40, 30, 60, 50, 60, 40, 30, 60, 50, 60, 40, 30, 60, 50]
-    }, {
-      "name": "Caja B",
-      "data": [5, 10.2, 30, 35, 35, 35, 5, 10.2, 30, 35, 35, 35, 5, 10.2]
-    }, {
-      "name": "Foo",
-      "data": [25.56, 64, 27, 70, 10, 50, 25.56, 64, 27, 70, 10, 50, 25.56, 64]
-    }],
-  }
+       "series": [{
+        "name": "Efectivo", 
+        "data": [-5, -40, -50, -40, 40, 80, 160]
+      },{
+        "name": "Cuenta Corriente",
+        "data": [1000, 1000, -400, -400, -400, 600, 1000]
+      },{
+        "name": "Ahorros",
+        "data": [0, 0, 400, 500, 500, 500, 0]
+      }]
+    }
+  }, 500);
+
 
 //piechart categorias
 //gasto
@@ -515,39 +687,40 @@ $timeout(function () {
   }
 }, 50);
 
-//ingreso
-pieIngreso= sqliteMovementsFactory.selectBalanceCat("Ingreso");
-$timeout(function () {
-  $scope.chartpieIngreso = {
-    options: {
-      chart: {
-        type: 'pie',
+
+  //ingreso
+  pieIngreso= sqliteMovementsFactory.selectBalanceCat("Ingreso");
+  $timeout(function () {
+    $scope.chartpieIngreso = {
+      options: {
+        chart: {
+          type: 'pie',
+        },
+        title: {
+          text: 'Ingresos por Categoría',
+        },
+        tooltip: {
+          pointFormat: '{series.name}: <b>{point.y}€, {point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+          pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: false
+            },
+            showInLegend: true
+          }
+        },
       },
-      title: {
-        text: 'Ingresos por Categoría',
+      credits: {
+        enabled: false
       },
-      tooltip: {
-        pointFormat: '{series.name}: <b>{point.y}€, {point.percentage:.1f}%</b>'
-      },
-      plotOptions: {
-        pie: {
-          allowPointSelect: true,
-          cursor: 'pointer',
-          dataLabels: {
-              enabled: false
-          },
-          showInLegend: true
-        }
-      },
-    },
-    credits: {
-      enabled: false
-    },
-    "series": [{
-      name: 'Ingresos',
-      colorByPoint: true,
-      data: pieIngreso
-    }]
-  }
-}, 50);
+      "series": [{
+        name: 'Ingresos',
+        colorByPoint: true,
+        data: pieIngreso
+      }]
+    }
+  }, 50);
 });

@@ -1,0 +1,58 @@
+<ion-view view-title="Registrar Gasto" ng-controller="modalAutomaticCtrl">
+  <ion-content class="padding">
+
+    <ion-toggle toggle-class="toggle-balanced" ng-model="auto.toggle" ng-checked="auto.toggle">Activo</ion-toggle>
+
+    <ion-radio ng-repeat="item in auto.radio" ng-value="item.value" ng-model="item.value" ng-change="radioChange(item)">{{ item.value }}</ion-radio>
+
+    <label class="item item-input item-select">
+      <div class="input-label">
+        Periodo:
+      </div>
+      <select ng-model="auto.term">
+        <option selected>Diario</option>
+        <option>Semanal</option>
+        <option>Mensual</option>
+        <option>Anual</option>
+      </select>
+    </label>
+
+    <div class="item item-input">
+      <input type="text" placeholder="Fecha" ng-model="auto.date" ng-click="chooseDate()">
+    </div>
+
+    <label class="item item-input item-select">
+      <div class="input-label">
+        Repetir:
+      </div>
+      <select ng-model='numbers.selected' ng-options="number.value for number in numbers"></select>
+    </label>
+
+    <label class="item item-input item-select">
+      <div class="input-label">
+        Cuenta:
+      </div>
+      <select ng-model="auto.account" ng-options="account.id as account.account for account in auto.accounts"></select>
+    </label>
+
+    <label class="item item-input item-select">
+      <div class="input-label">
+        Categoría:
+      </div>
+      <select ng-model="auto.category" ng-options="category.id as category.name for category in auto.categoriesMinus"></select>
+    </label>
+
+    <div class="item item-input">
+      <input type="tel" placeholder="Cantidad" ng-model="auto.amount">
+    </div>
+
+    <div class="item item-input">
+      <input type="text" placeholder="Escriba una descripción breve" ng-model="auto.description">
+    </div>
+
+    <div class="button-bar">
+      <button class="button button-small button-balanced padding" ng-click="save()">Guardar</button>
+      <button class="button button-small button-assertive padding" ng-click="cancel()">Cancelar</button>
+    </div>
+  </ion-content>
+</ion-view>
