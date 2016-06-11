@@ -201,13 +201,17 @@ controllers.controller("OperationCtrl", function($scope, $timeout, $ionicHistory
     }, 50);
   });
 
-  $scope.insertCat = function(name){
-    sqliteCategoriesFactory.insertCategory(name);
+  $scope.insertCatExpense = function(category){
+    sqliteCategoriesFactory.insertCategory(category, "Gasto");
+    $ionicHistory.goBack();
+  }
+  $scope.insertCatIncome = function(category){
+    sqliteCategoriesFactory.insertCategory(category, "Ingreso");
     $ionicHistory.goBack();
   }
 
-  $scope.insertAcc = function(name){
-    sqliteAccountsFactory.insertAccount(name);
+  $scope.insertAcc = function(account){
+    sqliteAccountsFactory.insertAccount(account, 0, 0, 0);
     $ionicHistory.goBack();
   }
 

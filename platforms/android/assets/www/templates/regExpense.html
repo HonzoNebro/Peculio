@@ -10,18 +10,18 @@
       <!--<a href="#/app/calculadora" class="button button-icon icon ion-calculator"></a>-->
       <button class="button button-icon icon ion-calculator" ng-click="openModal()"></button>
     </div>
-    <!--<div class="button-bar padding">
-        <a href="#/app/addAccount" class="button" >Nueva Cuenta</a>
-      </div>-->
+    <div class="button-bar padding">
+        <a href="#/app/addAccount" class="button button-outline button-positive">Nueva Cuenta</a>
+    </div>
     <label class="item item-input item-select">
         <div class="input-label">
           Cuenta:
         </div>
         <select ng-model='operation.acc' ng-options="account.id as account.name for account in accounts"></select>
       </label>
-      <!--<div class="button-bar padding">
-        <a href="#/app/addCategory" class="button" >Nueva Categoria</a>
-      </div>-->
+      <div class="button-bar padding">
+        <a href="#/app/addCategoryExpense" class="button button-outline button-positive">Nueva Categoria</a>
+      </div>
 
       <label class="item item-input item-select">
         <div class="input-label">

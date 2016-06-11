@@ -12,9 +12,9 @@
       <button class="button button-icon icon ion-calculator" ng-click="openModal()"></button>
     </div>
 
-    <!--<div class="button-bar padding">
-        <a href="#/app/addAccount" class="button" >agregar cuenta</a>
-    </div>-->
+    <div class="button-bar padding">
+        <a href="#/app/addAccount" class="button button-outline button-positive">Nueva Cuenta</a>
+    </div>
 
     <label class="item item-input item-select">
     <div class="input-label">
@@ -22,9 +22,9 @@
       </div>
         <select ng-model='operation.acc' ng-options="account.id as account.name for account in accounts"></select>
         </label>
-      <!--<div class="button-bar padding">
-      <a href="#/app/addCategory" class="button" >agregar categoria</a>
-    </div>-->
+    <div class="button-bar padding">
+      <a href="#/app/addCategoryIncome" class="button button-outline button-positive">Nueva Categoría</a>
+    </div>
     <label class="item item-input item-select">
       <div class="input-label">
         Categoría:

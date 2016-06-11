@@ -127,10 +127,10 @@ factories.factory("sqliteCategoriesFactory", function($cordovaSQLite) {
       })
       return categories
     },
-    insertCategory: function(name){
-      var query = "INSERT INTO categories (name) VALUES (?)";
-      $cordovaSQLite.execute(db,query, [name]).then(function(results) {
-        console.log("INSERT RECORDS ID -> " + results.insertId + " NAME: " + results.name);
+    insertCategory: function(category, sign){
+      var query = "INSERT INTO categories (category, sign) VALUES (?,?)";
+      $cordovaSQLite.execute(db,query, [category, sign]).then(function(results) {
+        console.log("INSERT RECORDS ID -> " + results.insertId + " CATEGORY: " + category + "SIGN: "+sign);
       }, function (err) {
         console.error(err);
       });
@@ -158,10 +158,10 @@ factories.factory("sqliteAccountsFactory", function($cordovaSQLite) {
       })
       return accounts
     },
-    insertAccount: function(name){
-      var query = "INSERT INTO accounts (name) VALUES (?)";
-      $cordovaSQLite.execute(db,query, [name]).then(function(results) {
-        console.log("INSERT RECORDS ID -> " + results.insertId);
+    insertAccount: function(account, incomes, expenses, balance){
+      var query = "INSERT INTO accounts (account, incomes, expenses, balance) VALUES (?,?,?,?)";
+      $cordovaSQLite.execute(db,query, [account, incomes, expenses, balance]).then(function(results) {
+        console.log("INSERT RECORDS ID -> " + results.insertId + " ACCOUNT: "+ account);
       }, function (err) {
         console.error(err);
       });

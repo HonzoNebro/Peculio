@@ -26,20 +26,20 @@ angular.module('starter', ['ionic', 'ngCordova', 'starter.controllers', 'starter
     //$cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS test (date integer primary key, test text)");
 
     $cordovaSQLite.execute(db, "DROP TABLE IF EXISTS categories");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, category TEXT, sign TEXT, account TEXT)");
-    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Autopista", "Gasto"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Bebidas", "Gasto"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Comida", "Gasto"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Gasolina", "Gasto"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Hotel", "Gasto"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Mercancia", "Gasto"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Otros", "Gasto"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Personales", "Gasto"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Propinas", "Gasto"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Sueldo", "Ingreso"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Ventas", "Ingreso"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Prestamo", "Ingreso"]);
-    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign, account) VALUES (?,?,?)", ["Transferencia", "Transferencia"]);
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, category TEXT, sign TEXT)");
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign) VALUES (?,?)", ["Autopista", "Gasto"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign) VALUES (?,?)", ["Bebidas", "Gasto"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign) VALUES (?,?)", ["Comida", "Gasto"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign) VALUES (?,?)", ["Gasolina", "Gasto"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign) VALUES (?,?)", ["Hotel", "Gasto"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign) VALUES (?,?)", ["Mercancia", "Gasto"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign) VALUES (?,?)", ["Otros", "Gasto"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign) VALUES (?,?)", ["Personales", "Gasto"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign) VALUES (?,?)", ["Propinas", "Gasto"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign) VALUES (?,?)", ["Sueldo", "Ingreso"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign) VALUES (?,?)", ["Ventas", "Ingreso"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign) VALUES (?,?)", ["Prestamo", "Ingreso"]);
+    $cordovaSQLite.execute(db, "INSERT INTO categories (category, sign) VALUES (?,?)", ["Transferencia", "Transferencia"]);
 
     $cordovaSQLite.execute(db, "DROP TABLE IF EXISTS accounts");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS accounts (id INTEGER PRIMARY KEY AUTOINCREMENT, account TEXT, incomes REAL, expenses REAL, balance REAL)");
@@ -161,11 +161,20 @@ angular.module('starter', ['ionic', 'ngCordova', 'starter.controllers', 'starter
     }
   })
 
-  .state('app.addCategory', {
-    url: '/addCategory',
+  .state('app.addCategoryIncome', {
+    url: '/addCategoryIncome',
     views: {
       'menuContent': {
-        templateUrl: 'templates/addCategory.html'
+        templateUrl: 'templates/addCategoryIncome.html'
+      }
+    }
+  })
+
+  .state('app.addCategoryExpense', {
+    url: '/addCategoryExpense',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/addCategoryExpense.html'
       }
     }
   })

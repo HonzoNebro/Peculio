@@ -1,15 +1,12 @@
 <ion-view view-title="Movimientos" ng-controller="MovementsCtrl">
   <ion-content class="padding">
-      <ion-item>
-        Cuenta/s: <select ng-model="mov.account" ng-options="account.id as account.name for account in accounts" ng-change="onChangeDates()"></select>
-      </ion-item>
-      <!--
-        <ion-item>
-          Mes/es: <select ng-model="mov.month" ng-options="month.id as month.name for month in months" ng-change="change()"></select>
-          Año/s: <select ng-model="mov.year" ng-options="year.id as year.name for year in years" ng-change="change()"></select>
-        </ion-item>
-      -->
       <div class="card">
+        <label class = "item item-input item-select item-positive">
+          <div class = "input-label">
+             Cuenta/s: 
+          </div>
+          <select ng-model="mov.account" ng-options="account.id as account.name for account in accounts" ng-change="onChangeDates()"></select>
+        </label>
         <label class="item item-input">
           <input type="text" placeholder="Desde" ng-model="from" ng-click="fromBtn()">
         </label>
@@ -17,8 +14,8 @@
           <input type="text" placeholder="Hasta" ng-model="to" ng-click="toBtn()">
         </label>
       </div>
-
         <button class="button button-block button-positive padding" ng-click="fill()">Filtrar Movimientos</button>
+
 
   	<ion-list can-swipe="true">
       <ion-item collection-repeat="record in records">
